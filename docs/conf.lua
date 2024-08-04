@@ -47,7 +47,7 @@ setmetatable(Page, {
     end
 })
 
-function is_page(inst)
+M.is_page = function (inst)
     return type(inst) == "table" and getmetatable(inst) == Page
 end
 
@@ -70,7 +70,7 @@ function Section:new(args)
 
     -- Process additional arguments
     for i = 2, #args do
-        if is_page(args[i]) then
+        if M.is_page(args[i]) then
             table.insert(inst.pages, args[i])
         else
             error("Argument " .. i .. " is not a Page instance", 2)
@@ -88,13 +88,15 @@ setmetatable(Section, {
 })
 
 -- Function to check if an instance is a Section
-function is_section(instance)
+M.is_section = function (instance)
     return type(instance) == "table" and getmetatable(instance) == Section
 end
 
 
 -- TODO: enforce that all refids are unique
 --       and build up a link map
+
+
 
 -- TODO: expect a '<refid>.htt', main to correspond to a page
 M.site = {
@@ -140,9 +142,24 @@ M.site = {
 
 }
 
+-- page.refid -> page instance
+M.ref2page = {}
+-- page.refid -> parent section (if any)
+M.ref2section = {}
+
+for _, entry in ipairs(M.site) do
+    if M.is_section(entry) then
+        local section = entry
+        for _, entry in ipairs(section.pages) do
+            M.ref2page[entry.refid] = entry
+            M.ref2section[entry.refid] = section
+        end
+    elseif M.is_page(entry) then
+        M.ref2page[entry.refid] = entry
+    end
+end
+
 M.generate_slug = generate_slug
 M.Page = Page
-M.is_page = is_page
 M.Section = Section
-M.is_section = is_section
 return M

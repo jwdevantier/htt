@@ -23,8 +23,7 @@ local renderPage = function (page, section)
     local tpl = require("//" .. page.refid .. ".htt")
 
     -- slug is also the dirpath, so create it in the out dir
-    local slug = ref2url[page.refid]
-    local out_dir = htt.fs.path("out" .. "/" .. slug)
+    local out_dir = htt.fs.path("out" .. "/" .. page.slug)
     cwd:makePath(out_dir)
     local out_file = htt.fs.path_join(out_dir, "index.html")
 
@@ -32,8 +31,8 @@ local renderPage = function (page, section)
     --render(tpl.main, out_file)
     render(common.base, out_file, {
         content = tpl.main,
-        ref2url = ref2url,
         title = page.title,
+        page = page,
     })
 end
 
@@ -45,8 +44,7 @@ local preRender = function(page, section)
     else
         slug = page.slug
     end
-    -- store url, can be used for links later
-    ref2url[page.refid] = "/" .. slug
+    page.slug = "/" .. slug
 end
 
 for _, entry in ipairs(conf.site) do
@@ -72,6 +70,6 @@ for _, entry in ipairs(conf.site) do
     end
 end
 
-for refid, url in pairs(ref2url) do
-    print(refid .. " -> " .. url)
+for refid, page in pairs(conf.ref2page) do
+    print(refid .. " -> " .. page.slug)
 end
