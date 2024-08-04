@@ -1,6 +1,8 @@
+/docs/out
 /.zig-cache
 /zig-out
 /scribbles
 /apidocs
 PLAN.md
 .test-output
+*.out.lua

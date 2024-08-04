@@ -98,6 +98,11 @@ end
 
 -- TODO: expect a '<refid>.htt', main to correspond to a page
 M.site = {
+    Page{
+        title = "Hello",
+        refid = "index",
+        slug = ""
+    },
     Section{
         "Introduction",
         Page{
