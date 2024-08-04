@@ -34,6 +34,7 @@
 % @end
 
 % @component base
+% local section = conf.ref2section[ctx.page.refid]
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +47,7 @@
         html, body { height: 100%; }
     </style>
 </head>
-<body class="bg-white flex flex-col h-full" x-data="{ mobileMenuOpen: false, openSections: ['Interface Definition'] }">
+<body class="bg-white flex flex-col h-full" x-data="initState()">
     <!-- Mobile top bar -->
     <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
         <div class="flex justify-between items-center p-4">
@@ -81,6 +82,19 @@
             {{@ ctx.content ctx.ctx }}
         </div>
     </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: [
+                % -- load page with parent section initially expanded
+                % if section then
+                ~>'{{section.title}}'
+                % end
+                ~>]
+            }
+        }
+    </script>
 </body>
 </html>
 % @end
