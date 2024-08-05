@@ -2,6 +2,51 @@
 %local sitename = "HTT Documentation"
 %local conf = require("conf")
 
+% @component codebox
+% -- render a nice box for the code
+<div class="code-container relative max-w-2xl mx-auto mt-4">
+    <div class="bg-gray-100 p-4 rounded-md">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-gray-600 font-medium">
+            % if ctx.title then
+            ~> {{ctx.title}}:
+            % end
+            ~></span>
+            <button class="copy-button bg-white hover:bg-gray-100 text-gray-700 px-3 py-1 rounded-md border border-gray-300 text-sm" data-clipboard-target=".code-block">
+                Copy
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">{{@ ctx.c ctx.c_args }}</code></pre>
+        </div>
+    </div>
+</div>
+% @end
+
+% @component text
+{{ ctx.text }}
+% @end
+
+% -- include contents of a file as a text/code box
+% @component include
+% local content
+% local file = io.open(ctx.file, "r")
+% if file then
+% -- this actually circumvents the indentation provided by htt
+% -- this is a rare case of actually wanting that
+{{@ codebox {title = ctx.title, c = text, c_args = {text = file:read("*all")} } }}
+% file:close()
+% end
+% @end
+
+% -- evaluate component with args, show output as text/code box
+% @component eval
+% local m = require(ctx.file)
+% local component_name = ctx.component or "main"
+{{@ codebox {title = ctx.title, c = m[component_name], c_args = ctx.ctx} }}
+% @end
+
+
 % @component menuSection
 % local section = ctx.section
 <li>
