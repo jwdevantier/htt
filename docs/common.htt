@@ -17,7 +17,9 @@
     </div>
     <ul x-show="openSections.includes('{{ section.title }}')" class="ml-4 mt-2 space-y-2">
         % for _, page in ipairs(section.pages) do
-        <li><a href="{{ page.slug }}" class="text-gray-700 hover:text-gray-900">{{ page.title }}</a></li>
+        % local x = page.refid == ctx.page.refid and " font-bold" or ""
+        % print("page(" .. page.refid .. "), ctx.page(".. ctx.page.refid .. ") ->" .. tostring(x))
+        <li><a href="{{ page.slug }}" class="text-gray-700 hover:text-gray-700{{x}}">{{ page.title }}</a></li>
         % end
     </ul>
 </li>
@@ -28,7 +30,9 @@
     % if conf.is_section(entry) then
 {{@ menuSection { section = entry, page = ctx.page } }}
     % elseif conf.is_page(entry) then
-<li><a href="{{ entry.slug }}" class="text-blue-600 hover:underline">{{ entry.title }}</a></li>
+    % local x = entry.refid == ctx.page.refid and " font-bold" or ""
+    % print("entry(" .. entry.refid .. "), ctx.page(".. ctx.page.refid .. ") ->" .. tostring(x))
+<li><a href="{{ entry.slug }}" class="text-blue-600 hover:underline{{x}}">{{ entry.title }}</a></li>
     % end -- if
 % end -- for
 % @end
@@ -70,7 +74,7 @@
             <div class="p-4">
                 <nav>
                     <ul class="space-y-2">
-                        {{@ menu { page = page } }}
+                        {{@ menu { page = ctx.page } }}
                     </ul>
                 </nav>
             </div>
