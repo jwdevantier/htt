@@ -23,16 +23,6 @@ const ResolvePathError = error{
     FileNotAccessible,
 };
 
-const InitError = error{
-    ConfigDefinitionMissing,
-    ConfigValueInvalid,
-    UnexpectedInitError,
-};
-
-const EngineError = error{
-    UnexpectedLuaValueError,
-};
-
 // resolves config file path and checks that it is accessible by process
 // NOTE: caller must free memory
 pub fn resolvePath(a: Allocator, relpath: []const u8) ResolvePathError![]const u8 {
@@ -68,7 +58,6 @@ pub fn registerZigFuncs(lua: *Lua) !void {
     _ = lua.pushString(std.fs.path.sep_str);
     lua.setField(-2, "sep");
 
-    // _ = try lua.getGlobal("htt");
     _ = lua.getField(htt_ndx, "tpl");
     lua.pushFunction(ziglua.wrap(tpl.compile));
     lua.setField(-2, "compile");
