@@ -6,20 +6,20 @@
 % local section = ctx.section
 <li>
     <div @click="openSections.includes('{{ section.title }}') ? openSections = openSections.filter(i => i !== '{{ section.title }}') : openSections.push('{{ section.title }}')"
-            class="flex justify-between items-center cursor-pointer text-blue-600 hover:underline">
+            class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
         <span>{{ section.title }}</span>
-        <svg x-show="!openSections.includes('{{ section.title }}')" class="w-4 h-4 text-gray-500" viewBox="0 0 24 24">
+        <svg x-show="!openSections.includes('{{ section.title }}')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
             <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
         </svg>
-        <svg x-show="openSections.includes('{{ section.title }}')" class="w-4 h-4 text-gray-500" viewBox="0 0 24 24">
+        <svg x-show="openSections.includes('{{ section.title }}')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
             <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
         </svg>
     </div>
-    <ul x-show="openSections.includes('{{ section.title }}')" class="ml-4 mt-2 space-y-2">
+    <ul x-show="openSections.includes('{{ section.title }}')" class="ml-2">
         % for _, page in ipairs(section.pages) do
         % local x = page.refid == ctx.page.refid and " font-bold" or ""
         % print("page(" .. page.refid .. "), ctx.page(".. ctx.page.refid .. ") ->" .. tostring(x))
-        <li><a href="{{ page.slug }}" class="text-gray-700 hover:text-gray-700{{x}}">{{ page.title }}</a></li>
+        <li class="hover:bg-gray-200 pl-2"><a href="{{ page.slug }}" class="text-gray-500 block w-full h-full py-2{{x}}">{{ page.title }}</a></li>
         % end
     </ul>
 </li>
@@ -32,7 +32,7 @@
     % elseif conf.is_page(entry) then
     % local x = entry.refid == ctx.page.refid and " font-bold" or ""
     % print("entry(" .. entry.refid .. "), ctx.page(".. ctx.page.refid .. ") ->" .. tostring(x))
-<li><a href="{{ entry.slug }}" class="text-blue-600 hover:underline{{x}}">{{ entry.title }}</a></li>
+<li class="hover:bg-gray-200"><a href="{{ entry.slug }}" class="pl-2 text-blue-600 block w-full h-full py-2{{x}}">{{ entry.title }}</a></li>
     % end -- if
 % end -- for
 % @end
@@ -53,7 +53,7 @@
 </head>
 <body class="bg-white flex flex-col h-full" x-data="initState()">
     <!-- Mobile top bar -->
-    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
         <div class="flex justify-between items-center p-4">
             <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -71,9 +71,9 @@
         <!-- Sidebar (desktop) / Mobile menu -->
         <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
              class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
-            <div class="p-4">
-                <nav>
-                    <ul class="space-y-2">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
                         {{@ menu { page = ctx.page } }}
                     </ul>
                 </nav>
