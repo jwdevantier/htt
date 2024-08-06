@@ -187,13 +187,15 @@ pub fn compile(a: Allocator, tpl_fpath: []const u8, out_fpath: []const u8) !?Com
 
                 // escaping characters where needed
                 for (txt) |ch| {
-                    if (ch != '\'') {
+                    // * escape single quotes as we'll use those for writing the compiled Lua code.
+                    // * escape forward slashes as this is required
+                    if (ch == '\'' or ch == '\\') {
+                        buf[cur] = '\\';
+                        buf[cur + 1] = ch;
+                        cur += 2;
+                    } else {
                         buf[cur] = ch;
                         cur += 1;
-                    } else {
-                        buf[cur] = '\\';
-                        buf[cur + 1] = '\'';
-                        cur += 2;
                     }
                 }
                 cur = memwrite(buf, cur, "')\n");
