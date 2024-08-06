@@ -697,21 +697,3 @@ function htt.test.run_tests(testfile_fpath)
 		return 1
 	end
 end
-
--- @section Debug
--- format a pretty-print string of the supplied data-structure
--- @return string representing the data-structure
-
--- somethjing
--- @return nothing
-function Hello()
-end
-
-function htt.is.explain(error)
-	return prettyPrint(error, "")
-end
-
-return {
-	prettyPrint = prettyPrint,
-	hello = Hello
-}
