@@ -4,20 +4,10 @@
 
 % @component codebox
 % -- render a nice box for the code
-<div class="code-container relative max-w-2xl mx-auto mt-4">
-    <div class="bg-gray-100 p-4 rounded-md">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-gray-600 font-medium">
-            % if ctx.title then
-            ~> {{ctx.title}}:
-            % end
-            ~></span>
-            <button class="copy-button bg-white hover:bg-gray-100 text-gray-700 px-3 py-1 rounded-md border border-gray-300 text-sm" data-clipboard-target=".code-block">
-                Copy
-            </button>
-        </div>
+<div class="code-container relative my-4">
+    <div class="bg-stone-100 p-4 rounded-md">
         <div class="overflow-x-auto">
-            <pre class="code-block text-sm"><code class="text-gray-800">{{@ ctx.c ctx.c_args }}</code></pre>
+<pre class="code-block text-sm"><code class="text-gray-800">{{@ ctx.c ctx.c_args }}</code></pre>
         </div>
     </div>
 </div>
@@ -34,18 +24,78 @@
 % if file then
 % -- this actually circumvents the indentation provided by htt
 % -- this is a rare case of actually wanting that
-{{@ codebox {title = ctx.title, c = text, c_args = {text = file:read("*all")} } }}
+{{@ codebox {c = text, c_args = {text = file:read("*all")} } }}
 % file:close()
 % end
+% @end
+
+% -- produce a code box listing the contents of a particular component
+% @component compSrc
+% @code
+local fpath = ctx.file:sub(1,2) == "//" and ctx.file:sub(3) or ctx.file
+local include_directives
+if ctx.include_directives ~= nil then
+    include_directives = ctx.include_directives ~= false
+else
+    include_directives = false
+end
+% @end
+% local content = extract_component_source(fpath, ctx.component, include_directives)
+% -- this actually circumvents the indentation provided by htt
+% -- this is a rare case of actually wanting that
+{{@ codebox {c = text, c_args = {text = content} } }}
 % @end
 
 % -- evaluate component with args, show output as text/code box
 % @component eval
 % local m = require(ctx.file)
 % local component_name = ctx.component or "main"
-{{@ codebox {title = ctx.title, c = m[component_name], c_args = ctx.ctx} }}
+{{@ codebox {c = m[component_name], c_args = ctx.ctx or {} } }}
 % @end
 
+% @component textbox
+{{@ codebox {c = text, c_args = {text = ctx.text} } }}
+% @end
+
+% @component bNote
+<div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+  <div class="flex">
+    <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">{{ctx.icon}}</svg></div>
+    <div>
+    % if ctx.title then
+      <p class="font-bold text-stone-500">{{ctx.title}}</p>
+    % end
+    <span>{{@ ctx.c ctx.ctx}}</span>
+    </div>
+  </div>
+</div>
+% @end
+
+% @component note
+% @code
+local args = {
+    -- circle with an 'i'
+    icon = [[<path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>]],
+    title = ctx.title,
+    c = ctx.c,
+    ctx = ctx.ctx
+}
+% @end
+{{@ bNote args }}
+% @end
+
+% @component warn
+% @code
+local args = {
+    -- circle with an 'i'
+    icon = [[<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>]],
+    title = ctx.title,
+    c = ctx.c,
+    ctx = ctx.ctx
+}
+% @end
+{{@ bNote args }}
+% @end
 
 % @component menuSection
 % local section = ctx.section
@@ -127,8 +177,10 @@
 
         <!-- Main Content -->
         <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
-            <h1 class="text-2xl font-bold mb-5">{{ctx.title}}</h1>
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">{{ctx.title}}</h1>
             {{@ ctx.content ctx.ctx }}
+            </div>
         </div>
     </div>
     <script>
@@ -143,6 +195,29 @@
                 ~>]
             }
         }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+    
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+    
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+    
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
     </script>
 </body>
 </html>
