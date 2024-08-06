@@ -1,0 +1,44 @@
+% @component helloWorld
+Hello, John!
+% @end
+
+% @component loop3
+% for i = 1, 3 do
+hello!
+% end
+% @end
+
+% @component ifRender
+% if 1 == 2 then
+Math is broken!
+% else
+Phew! Math works
+%end
+% @end
+
+% @component varExample
+% local name = "Peter"
+Hello, {{name}}!
+2 + 2 is {{2 + 2}}
+% @end
+
+% @component child
+Sincerely hello
+  - Child
+% @end
+
+% @component parent
+let's call the child:
+{{@ child {} }}
+
+Fun! let's do that again, with indentation!
+    {{@ child {} }}
+% @end
+
+% @component indent
+  hello
+    hello1
+      hello2
+    hello1
+  hello
+% @end
