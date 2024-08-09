@@ -100,8 +100,13 @@ function htt.dofile_with_tb(script_fpath)
 	end
 
 	local function err_handler(err)
-		-- 2, skip traceback and this fn in TB
-		return debug.traceback(err, 2)
+		-- rewrite error output so [string "xxxx"] becomes xxxx
+		-- This means [string "HTT Library"] shows up as HTT Library
+		-- 2 => remove 2 innermost frames (this and dofile_with_tb)
+		--      from call stack
+		local tb = debug.traceback(err, 2)
+		tb = tb:gsub('%[string "(.-)"%]', '[%1]')
+		return tb
 	end
 
 	local ok, result = xpcall(chunk, err_handler)
