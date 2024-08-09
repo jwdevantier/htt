@@ -31,6 +31,34 @@ fn setLuaPackagePath(a: Allocator, lua: *Lua, htt_root: []const u8) !void {
     _ = lua.setTable(-3);
 }
 
+fn doString(lua: *Lua, name: [:0]const u8, buf: []const u8) !void {
+    lua.loadBuffer(buf, name, .text) catch |err| {
+        const err_msg = lua.toString(-1) catch unreachable;
+        std.log.err(
+            \\ Error Loading {s} Code:
+            \\ ---
+            \\ {s}
+            \\ ---
+            \\
+            \\ This is a bug, please report it!
+        , .{ name, err_msg });
+        return err;
+    };
+
+    lua.protectedCall(0, ziglua.mult_return, 0) catch |err| {
+        const err_msg = lua.toString(-1) catch unreachable;
+        std.log.err(
+            \\ Error Evaluating {s} Code:
+            \\ ---
+            \\ {s}
+            \\ ---
+            \\
+            \\ This is a bug, please report it!
+        , .{ name, err_msg });
+        return err;
+    };
+}
+
 fn doRun(script_fpath_: []const u8) !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -64,18 +92,7 @@ fn doRun(script_fpath_: []const u8) !void {
     lua.openLibs();
 
     const prelude = @embedFile("./prelude.lua");
-    lua.doString(prelude) catch |err| {
-        const err_msg = lua.toString(-1) catch unreachable;
-        std.log.err(
-            \\ Error Evaluating prelude code:
-            \\ ---
-            \\ {s}
-            \\ ---
-            \\
-            \\ This is a bug, please report it!
-        , .{err_msg});
-        return err;
-    };
+    try doString(lua, "HTT Library", prelude);
 
     try setLuaPackagePath(aai, lua, htt_root);
 
@@ -84,20 +101,8 @@ fn doRun(script_fpath_: []const u8) !void {
     // this permits documenting stubs using ldoc
     try engine.registerZigFuncs(lua);
 
-    // TODO: load httprelude.lua
     const htt_prelude = @embedFile("./htt_prelude.lua");
-    lua.doString(htt_prelude) catch |err| {
-        const err_msg = lua.toString(-1) catch unreachable;
-        std.log.err(
-            \\ Error Evaluating htt prelude code:
-            \\ ---
-            \\ {s}
-            \\ ---
-            \\
-            \\ This is a bug, please report it!
-        , .{err_msg});
-        return err;
-    };
+    try doString(lua, "HTT Loader", htt_prelude);
 
     _ = try lua.getGlobal("htt");
     _ = lua.getField(-1, "dofile_with_tb");
