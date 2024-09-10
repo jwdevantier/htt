@@ -104,7 +104,7 @@ function htt.dofile_with_tb(script_fpath)
 		-- This means [string "HTT Library"] shows up as HTT Library
 		-- 2 => remove 2 innermost frames (this and dofile_with_tb)
 		--      from call stack
-		local tb = debug.traceback(err, 2)
+		local tb = debug.traceback(err, 3)
 		tb = tb:gsub('%[string "(.-)"%]', '[%1]')
 		return tb
 	end
@@ -112,7 +112,7 @@ function htt.dofile_with_tb(script_fpath)
 	local ok, result = xpcall(chunk, err_handler)
 	if not ok then
 		-- If an error occurs during execution, print the traceback from the error handler
-		return nil, "Error during execution: " .. result
+		return nil, "\nError during execution: " .. result
 	end
 	return result, nil
 end
@@ -459,9 +459,8 @@ function htt.tpl.install_loader()
 		if chunk then
 			return chunk
 		else
-			local msg = "Error evaluating '" .. module_name .. "'"
-			print(debug.traceback(msg))
-			error(msg .. ": " .. err)
+			local msg = "\nError evaluating '" .. module_name .. "'"
+			error(msg .. ":\n\t" .. err)
 		end
 	end
 
