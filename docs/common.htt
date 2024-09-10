@@ -2,6 +2,15 @@
 %local sitename = "HTT Documentation"
 %local conf = require("conf")
 
+% @component xref
+% local page = conf.ref2page[ctx.ref]
+% if page then
+<a href="{{ page.slug }}" class="text-blue-600">{{ ctx.txt or page.title}}</a>
+% else
+<a href="#" class="text-red-600">{{ ctx.txt or ctx.ref or "invalid link"}}</a>
+% end
+% @end
+
 % @component codebox
 % -- render a nice box for the code
 <div class="code-container relative my-4">
