@@ -1,0 +1,38 @@
+
+% @component node
+{{ctx.name}}
+% @end
+
+% @component render_nodes
+% for _, elem in ipairs(nodes()) do
+{{@ node elem }}
+% end
+% @end
+
+% @component main
+package ast;
+
+import (
+	"bytes"
+	"strings"
+
+	"github.com/zanshin/interpreter/token"
+)
+
+type Node interface {
+	TokenLiteral() string
+	String() string
+}
+
+type Statement interface {
+	Node
+	statementNode()
+}
+
+type Expression interface {
+	Node
+	expressionNode()
+}
+
+{{@ render_nodes {} }}
+% @end

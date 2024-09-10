@@ -1,0 +1,92 @@
+% @component node
+type {{ctx.name}} struct {
+    Token token.Token
+    % for _, field in ipairs(ctx.fields) do
+    {{field.name}} {{field.type}}
+    % end
+}
+
+% if ctx.is_expr == true then
+func ({{ctx.short}} *{{ctx.name}}) expressionNode() {}
+% else
+func ({{ctx.short}} *{{ctx.name}}) statementNode() {}
+% end
+
+func ({{ctx.short}} *{{ctx.name}}) TokenLiteral() string {
+  return {{ctx.short}}.Token.Literal
+}
+
+func ({{ctx.short}} *{{ctx.name}}) String() string {
+  % if ctx.string_fn then
+  {{@ ctx.string_fn ctx }}
+  % else
+  return {{ctx.short}}.Token.Literal
+  % end
+}
+% @end
+
+% @component return_statement_string
+var out bytes.Buffer
+
+out.WriteString(rs.Token.Literal + " ")
+if rs.ReturnValue != nil {
+	out.WriteString(rs.ReturnValue.String())
+}
+
+out.WriteString(";")
+
+return out.String()
+% @end
+
+% @component expr_statement_string
+if {{ctx.short}}.Expression != nil {
+	return {{ctx.short}}.Expression.String()
+}
+return ""
+% @end
+
+% @component prefix_expr_string
+var out bytes.Buffer
+
+out.WriteString("(")
+out.WriteString({{ctx.short}}.Operator)
+out.WriteString({{ctx.short}}.Right.String())
+out.WriteString(")")
+
+return out.String()
+% @end
+
+% @component render_nodes
+% for _, elem in ipairs(nodes(M)) do
+
+{{@ node elem }}
+% end
+% @end
+
+% @component main
+package ast;
+
+import (
+	"bytes"
+	"strings"
+
+	"github.com/zanshin/interpreter/token"
+)
+
+type Node interface {
+	TokenLiteral() string
+	String() string
+}
+
+type Statement interface {
+	Node
+	statementNode()
+}
+
+type Expression interface {
+	Node
+	expressionNode()
+}
+
+{{@ render_nodes {} }}
+% @end

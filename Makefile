@@ -9,6 +9,15 @@ help:  ## Prints all the targets in all the Makefiles
 list:  ## List all make targets
 	@${MAKE} -pRrn : -f $(MAKEFILE_LIST) 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | sort
 
+
+HTT_DIR := ./zig-out/makefile
+HTT := $(HTT_DIR)/bin/htt
+
+$(HTT):
+	zig build -p $(HTT_DIR)
+
+htt: $(HTT)
+
 .PHONY: site
 site:  ## Generate project site
 	# hugo ...
@@ -16,6 +25,16 @@ site:  ## Generate project site
 
 .PHONY: docs
 docs: site  ## Generate documentation
+
+.PHONY: docs-gen
+docs-gen: htt  ## generate pages for documentation
+	$(HTT) docs/gensite.lua
+
+.PHONY: docs-dev
+docs-dev: htt  ## run local docs development server
+	$(MAKE) docs-gen
+	@echo "now run '$(MAKE) docs-gen' to re-render example" 
+	cd docs/out; python -m http.server 1314
 
 .PHONY: test-base
 test-base:  ## run application unit tests

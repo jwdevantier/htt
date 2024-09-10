@@ -1,3 +1,36 @@
+% @code
+local C = require "//common.htt"
+local T = require "//tags"
+local code = T.code
+local i = T.i
+% @end
+
+
 % @component main
-welcome to the index
+Effortlessly generate code or configuration, low-level wizards welcome.
+
+{{T.h2 "What is HTT?"}}
+<p class="mb-2">
+HTT is a code-generator. It is built to help you generate code or configuration files from some high-level description which you either write yourself or get from elsewhere.
+~></p>
+
+{{T.h2 "What can I do with code generation?"}}
+<p class="mb-4">
+You could generate repetitive code, such as a slew of AST types in Go, dataclass-like classes in Python, a series of functions for manipulating bits without using bitfields in C and so on. The possibilities are {{i "everywhere"}}.
+~></p>
+
+<p class="mb-4">
+But it is not limited to code. This site is generated using HTT. It embeds code examples from actual files, and it runs them, captures their output and embeds that also. It also generates the menu-structure and places output in a folder structure which enables user-friendly URLs.
+~></p>
+
+<p class="mb-4">
+Code generation is also great whenever crossing language- or service/application boundaries.
+Think of programs written in different languages exchanging messages with code generated from a Protobuf description. Or of clients, whose code for interacting with a web-service is generated from its Swagger API description.
+~></p>
+
+<p class="mb-4">
+Finally, code generation is also an excellent way to address shortcomings of configuration languages like Ansible, terraform, Nix and so on.
+If your DSL files become very long, verbose or difficult to read, perhaps it is time to generate them instead.
+~></p>
+
 % @end

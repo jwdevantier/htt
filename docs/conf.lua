@@ -1,95 +1,94 @@
-
 local M = {}
 
 function generate_slug(input)
-    -- Replace '&' with 'and'
-    local slug = string.gsub(input, "&", "and")
+	-- Replace '&' with 'and'
+	local slug = string.gsub(input, "&", "and")
 
-    -- Convert to lowercase
-    local slug = string.lower(input)
+	-- Convert to lowercase
+	local slug = string.lower(input)
 
-    -- Replace non-alphanumeric characters with hyphens
-    slug = string.gsub(slug, "[^%w%s-]", "-")
+	-- Replace non-alphanumeric characters with hyphens
+	slug = string.gsub(slug, "[^%w%s-]", "-")
 
-    -- Replace spaces with hyphens
-    slug = string.gsub(slug, "%s", "-")
-    
-    -- Replace consecutive hyphens with a single hyphen
-    slug = string.gsub(slug, "%-+", "-")
-    
-    -- Remove leading and trailing hyphens
-    slug = string.gsub(slug, "^%-+", "")
-    slug = string.gsub(slug, "%-+$", "")
-    
-    return slug
+	-- Replace spaces with hyphens
+	slug = string.gsub(slug, "%s", "-")
+
+	-- Replace consecutive hyphens with a single hyphen
+	slug = string.gsub(slug, "%-+", "-")
+
+	-- Remove leading and trailing hyphens
+	slug = string.gsub(slug, "^%-+", "")
+	slug = string.gsub(slug, "%-+$", "")
+
+	return slug
 end
 
 Page = {}
 Page.__index = Page
 
 function Page:new(vars)
-    local inst = setmetatable({}, self)
+	local inst = setmetatable({}, self)
 
-    if vars.title == nil then
-        error("pages must have a title")
-    end
-    inst.title = vars.title
-    inst.slug = vars.slug or generate_slug(inst.title)
-    inst.refid = vars.refid or inst.slug
+	if vars.title == nil then
+		error("pages must have a title")
+	end
+	inst.title = vars.title
+	inst.slug = vars.slug or generate_slug(inst.title)
+	inst.refid = vars.refid or inst.slug
 
-    return inst
+	return inst
 end
 
 setmetatable(Page, {
-    -- Make Page callable
-    __call = function(cls, ...)
-        return cls:new(...)
-    end
+	-- Make Page callable
+	__call = function(cls, ...)
+		return cls:new(...)
+	end
 })
 
-M.is_page = function (inst)
-    return type(inst) == "table" and getmetatable(inst) == Page
+M.is_page = function(inst)
+	return type(inst) == "table" and getmetatable(inst) == Page
 end
 
 Section = {}
 Section.__index = Section
 
 function Section:new(args)
-    if type(args) ~= "table" then
-        error("Section constructor expects a table argument", 2)
-    end
-    
-    if type(args[1]) ~= "string" then
-        error("First element of Section constructor table must be a string (title)", 2)
-    end
+	if type(args) ~= "table" then
+		error("Section constructor expects a table argument", 2)
+	end
 
-    local inst = setmetatable({}, self)
-    inst.title = args[1]
-    inst.slug = generate_slug(inst.title)
-    inst.pages = {}
+	if type(args[1]) ~= "string" then
+		error("First element of Section constructor table must be a string (title)", 2)
+	end
 
-    -- Process additional arguments
-    for i = 2, #args do
-        if M.is_page(args[i]) then
-            table.insert(inst.pages, args[i])
-        else
-            error("Argument " .. i .. " is not a Page instance", 2)
-        end
-    end
+	local inst = setmetatable({}, self)
+	inst.title = args[1]
+	inst.slug = generate_slug(inst.title)
+	inst.pages = {}
 
-    return inst
+	-- Process additional arguments
+	for i = 2, #args do
+		if M.is_page(args[i]) then
+			table.insert(inst.pages, args[i])
+		else
+			error("Argument " .. i .. " is not a Page instance", 2)
+		end
+	end
+
+	return inst
 end
 
 -- Make Section callable
 setmetatable(Section, {
-    __call = function(cls, ...)
-        return cls:new(...)
-    end
+	__call = function(cls, ...)
+		return cls:new(...)
+	end
 })
 
 -- Function to check if an instance is a Section
-M.is_section = function (instance)
-    return type(instance) == "table" and getmetatable(instance) == Section
+M.is_section = function(instance)
+	return type(instance) == "table" and getmetatable(instance) == Section
 end
 
 
@@ -97,49 +96,27 @@ end
 --       and build up a link map
 
 
-
 -- TODO: expect a '<refid>.htt', main to correspond to a page
 M.site = {
-    Page{
-        title = "Hello",
-        refid = "index",
-        slug = ""
-    },
-    Section{
-        "Introduction",
-        Page{
-            title = "What is HTT",
-            refid = "htt-intro"
-        },
-        Page{
-            title = "Quick Start",
-            refid = "quick-start"
-        },
-    },
-
-    -- {
-    --     "Examples",
-    --     Page{
-    --         title = "Hello World"
-    --     },
-    --     Page{
-    --         title = "Syntax Overview",
-    --         refid = "syntax"
-    --     },
-    --     Page{
-    --         title = "Generating types in Go"
-    --     }
-    --     -- Generating a static site
-    -- },
-
-    -- {
-    --     "Tips & Tricks",
-    --     Page{
-    --         title = "Debugging",
-    --     }
-    --     -- Go trick of delaying bind to modules by having a model be a func
-    -- }
-
+	Page {
+		title = "Intro",
+		refid = "htt-intro",
+		slug = ""
+	},
+	Section {
+		"Usage",
+		Page {
+			title = "Quick Start",
+			refid = "quick-start",
+		},
+	},
+	Section {
+		"Examples",
+		Page {
+			title = "Implementing types in Go",
+			refid = "ex-go-ast"
+		},
+	}
 }
 
 -- page.refid -> page instance
@@ -148,18 +125,19 @@ M.ref2page = {}
 M.ref2section = {}
 
 for _, entry in ipairs(M.site) do
-    if M.is_section(entry) then
-        local section = entry
-        for _, entry in ipairs(section.pages) do
-            M.ref2page[entry.refid] = entry
-            M.ref2section[entry.refid] = section
-        end
-    elseif M.is_page(entry) then
-        M.ref2page[entry.refid] = entry
-    end
+	if M.is_section(entry) then
+		local section = entry
+		for _, entry in ipairs(section.pages) do
+			M.ref2page[entry.refid] = entry
+			M.ref2section[entry.refid] = section
+		end
+	elseif M.is_page(entry) then
+		M.ref2page[entry.refid] = entry
+	end
 end
 
 M.generate_slug = generate_slug
 M.Page = Page
 M.Section = Section
 return M
+

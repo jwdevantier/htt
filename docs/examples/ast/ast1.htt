@@ -1,0 +1,26 @@
+
+% @component main
+package ast;
+
+import (
+	"bytes"
+	"strings"
+
+	"github.com/zanshin/interpreter/token"
+)
+
+type Node interface {
+	TokenLiteral() string
+	String() string
+}
+
+type Statement interface {
+	Node
+	statementNode()
+}
+
+type Expression interface {
+	Node
+	expressionNode()
+}
+% @end

@@ -1,0 +1,51 @@
+
+% @component node
+type {{ctx.name}} struct {
+    Token token.Token
+    % for _, field in ipairs(ctx.fields) do
+    {{field.name}} {{field.type}}
+    % end
+}
+% @end
+
+% -- first take
+% @component render_nodes_nospace
+% for _, elem in ipairs(nodes()) do
+{{@ node elem }}
+% end
+% @end
+
+% @component render_nodes
+% for _, elem in ipairs(nodes()) do
+
+{{@ node elem }}
+% end
+% @end
+
+% @component main
+package ast;
+
+import (
+	"bytes"
+	"strings"
+
+	"github.com/zanshin/interpreter/token"
+)
+
+type Node interface {
+	TokenLiteral() string
+	String() string
+}
+
+type Statement interface {
+	Node
+	statementNode()
+}
+
+type Expression interface {
+	Node
+	expressionNode()
+}
+
+{{@ render_nodes {} }}
+% @end

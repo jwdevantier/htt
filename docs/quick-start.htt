@@ -13,7 +13,7 @@ compiled to Lua as they are first imported.
 
 % @component directiveNote
 <p>
-HTT interprets lines where text after {{code "%"}} starts with {{code "@"}} differently. These lines are taken to be <em>directives</em>, of which there are currently 2: {{code "@component"}} and {{code "code"}}. We will cover this more below.
+HTT interprets lines where text after {{code "%"}} starts with {{code "@"}} differently. These lines are taken to be <em>directives</em>, of which there are currently 2: {{code "@component"}} and {{code "@code"}}. We will cover this more below.
 ~></p>
 % @end
 
@@ -23,10 +23,7 @@ HTT interprets lines where text after {{code "%"}} starts with {{code "@"}} diff
 % @end
 
 % @component indentationNote
-<p>If you look at the example, you can see that the two calls to {{code "child"}} produces differently indented output.
-~></p>
-
-<p>This is because the final indentation of any given line is the sum of:
+<p>The final indentation of any given line is the sum of:
 ~></p>
 <ul class="mt-2 list-disc list-inside">
     <li>The indentation of the line itself within the component</li>
@@ -63,7 +60,7 @@ If you now run the command {{code "htt test-htt.lua"}}, then the {{code "result.
 
 {{@ C.eval {file = qex, component = "helloWorld"}}}
 
-{{T.h4 "To Summarize"}}
+{{T.h3 "To Summarize"}}
 <ol class="list-decimal list-inside">
   <li>We wrote a template file, {{code "helloworld.htt"}}, and defined a component, {{code "helloWorld"}}, inside it</li>
   <li>We wrote a lua script, {{code "test-htt.lua"}}, which uses the {{code "render"}} call to render a component, {{code "helloWorld"}}, to a file: {{code "result.txt"}}.</li>
@@ -121,5 +118,69 @@ If we render this component, we get:
 ~></p>
 {{@ C.eval {file = qex, component = "parent"}}}
 
+{{T.h3 "Providing arguments to Components" }}
+<p>When introducing the syntax to call a component, {{code (T.raw "{{@ component ctx }}")}}, we touched on the {{code "ctx"}} being a Lua table.
+~></p>
+
+<p>We first define a component which uses the argument {{code "name"}}, if provided. Note that all arguments passed to a component are exposed via the {{code "ctx"}} variable. {{code "ctx.name"}} is simply the Lua way of accessing the attribute {{code "name"}} on the {{code "ctx"}} table.
+~></p>
+{{@ C.compSrc {file = qex, component = "helloName", include_directives = true} }}
+
+{{ T.h4 "Calling component without name argument" }}
+<p>Calling the component without no name:</p>
+{{@ C.compSrc {file = qex, component = "callHelloNameNoArg"} }}
+
+<p>Produces the following:</p>
+{{@ C.eval {file = qex, component = "callHelloNameNoArg"}}}
+
+{{ T.h4 "Calling component with name argument" }}
+<p>Calling the component without no name:</p>
+{{@ C.compSrc {file = qex, component = "callHelloNamePeter"} }}
+
+<p>Produces the following:</p>
+{{@ C.eval {file = qex, component = "callHelloNamePeter"}}}
+
+{{T.h3 "Indentation and Components"}}
+A focus of HTT has been to get indentation "right". Before we summarize how it works, here's an expanded example:
+
+{{@ C.compSrc {file = qex, component = "child", include_directives = true} }}
+
+{{@ C.compSrc {file = qex, component = "middleChild", include_directives = true} }}
+
+{{@ C.compSrc {file = qex, component = "callWithIndentation", include_directives = true} }}
+
+<p>Rendering this out gives this output:
+~></p>
+
+{{@ C.eval {file = qex, component = "callWithIndentation"}}}
+
+
 {{@ C.note {title = "How indentation works", c = indentationNote} }}
+
+
+{{T.h2 "Line Continuations"}}
+<p>There will be times, usually when mixing output and lua lines, where you want to build up a single line of output across multiple lines in the template.
+~></p>
+
+<p>If a line starts with {{code "~>"}} (after whitespace), then the line is taken to be a continuation of the preceding line of output.
+~></p>
+
+{{T.h3 "Simple Example"}}
+{{@ C.compSrc {file = qex, component = "lineCont"} }}
+<p>This renders out to:
+~></p>
+{{@ C.eval {file = qex, component = "lineCont"}}}
+
+
+{{T.h3 "Realistic Example"}}
+<p>The following example builds up an array where elements are separated by {{code ", "}}. Another example would be rendering function arguments or parameters.
+~></p>
+{{@ C.compSrc {file = qex, component = "lineContArr"} }}
+<p>This renders out to:
+~></p>
+{{@ C.eval {file = qex, component = "callLineContArr"}}}
+
+<p>The line printing the separator uses a trick in Lua to simulate a ternary-if: <div>{{code "$test and $if-truthy or $otherwise"}}.</div>
+Alternatively, we could have used an if-block instead.
+~></p>
 % @end

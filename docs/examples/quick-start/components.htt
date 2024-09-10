@@ -13,7 +13,7 @@ hello!
 Math is broken!
 % else
 Phew! Math works
-%end
+% end
 % @end
 
 % @component varExample
@@ -30,15 +30,48 @@ Sincerely hello
 % @component parent
 let's call the child:
 {{@ child {} }}
+% @end
 
-Fun! let's do that again, with indentation!
+% @component middleChild
+--middle child
+  {{@ child {} }}
+% @end
+
+% @component callWithIndentation
+{{@ child {} }}
+    {{@ middleChild {} }}
     {{@ child {} }}
 % @end
 
-% @component indent
-  hello
-    hello1
-      hello2
-    hello1
-  hello
+% @component helloName
+Hello, {{ctx.name or "John Doe"}}!
+% @end
+
+% @component callHelloNameNoArg
+{{@ helloName {} }}
+% @end
+
+% @component callHelloNamePeter
+{{@ helloName {name = "Peter"} }}
+% @end
+
+% @component lineCont
+hello
+~>world!
+hello
+~> world...
+% @end
+
+% @component lineContArr
+% local sep = ctx.separator or ","
+[
+% for i, v in ipairs(ctx.lst) do
+% local is_last = (i == #ctx.lst)
+~> "{{v}}"{{not is_last and sep or ""}}
+% end
+~> ]
+% @end
+
+% @component callLineContArr
+{{@ lineContArr {lst = {"one", "two", "three"} } }}
 % @end
