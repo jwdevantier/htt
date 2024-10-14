@@ -563,8 +563,8 @@ pub const Lexer = struct {
                                 return .{ .left = token };
                             },
                             .right => |newPos| {
-                                // consume chars also
-                                pos = newPos + "]]".len;
+                                // consume chars also, one char is consumed "for free" @ next iter
+                                pos = newPos + ("]]".len - 1);
                             },
                         }
                     }
