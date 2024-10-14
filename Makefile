@@ -10,13 +10,19 @@ list:  ## List all make targets
 	@${MAKE} -pRrn : -f $(MAKEFILE_LIST) 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | sort
 
 
-HTT_DIR := ./zig-out/makefile
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+HTT_DIR := $(MAKEFILE_DIR)/zig-out/makefile
 HTT := $(HTT_DIR)/bin/htt
 
 $(HTT):
 	zig build -p $(HTT_DIR)
 
 htt: $(HTT)
+
+.PHONY: clean
+clean:  ## remove binaries
+	rm -rf $(MAKEFILE_DIR)/zig-out/makefile
+	rm -rf $(MAKEFILE_DIR)/zig-out/bin
 
 .PHONY: site
 site:  ## Generate project site
@@ -25,10 +31,11 @@ site:  ## Generate project site
 
 .PHONY: docs
 docs: site  ## Generate documentation
+	echo "not implemented yet!"
 
 .PHONY: docs-gen
 docs-gen: htt  ## generate pages for documentation
-	$(HTT) docs/gensite.lua
+	$(HTT) $(MAKEFILE_DIR)/docs/gensite.lua
 
 .PHONY: docs-dev
 docs-dev: htt  ## run local docs development server
