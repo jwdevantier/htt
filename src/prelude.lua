@@ -63,6 +63,10 @@ function htt.str.stringify(value, indentation)
 	end
 end
 
+function htt.str.starts_with(str, prefix)
+	return string.sub(str, 1, #prefix) == prefix
+end
+
 -- Utilities
 -- ------------------------------------------------------------
 function htt.enum(tbl)
