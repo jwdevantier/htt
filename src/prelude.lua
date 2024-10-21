@@ -106,7 +106,7 @@ function htt.dofile_with_tb(script_fpath)
 	local function err_handler(err)
 		-- rewrite error output so [string "xxxx"] becomes xxxx
 		-- This means [string "HTT Library"] shows up as HTT Library
-		-- 2 => remove 2 innermost frames (this and dofile_with_tb)
+		-- 2 => remove 3 innermost frames (the error() call, this handler, dofile_with_tb)
 		--      from call stack
 		local tb = debug.traceback(err, 3)
 		tb = tb:gsub('%[string "(.-)"%]', '[%1]')
@@ -116,7 +116,12 @@ function htt.dofile_with_tb(script_fpath)
 	local ok, result = xpcall(chunk, err_handler)
 	if not ok then
 		-- If an error occurs during execution, print the traceback from the error handler
-		return nil, "\nError during execution: " .. result
+		-- return nil, "\nError during execution: " .. result
+		if htt.str.starts_with(result, "\nError") then
+			return nil, result
+		else
+			return nil, "\nError during execution:\n\t" .. result
+		end
 	end
 	return result, nil
 end
@@ -439,7 +444,7 @@ function htt.tpl.install_loader()
 		local err = htt.tpl.compile(mod_path, out_path);
 		if err ~= nil then
 			local msg = {
-				"Error compiling '" .. module_name .. "'"
+				"\nError compiling HTT template '" .. module_name .. "'"
 			}
 			if type(err) == "string" then
 				table.insert(msg, err)
@@ -456,15 +461,15 @@ function htt.tpl.install_loader()
 				end
 			end
 
-			error(table.concat(msg, "\n"))
+			error(table.concat(msg, "\n"), 0)
 		end
 
 		local chunk, err = loadfile(out_path)
 		if chunk then
 			return chunk
 		else
-			local msg = "\nError evaluating '" .. module_name .. "'"
-			error(msg .. ":\n\t" .. err)
+			local msg = "\nError loading Lua module '" .. module_name .. "'"
+			error(msg .. ":\n\t" .. err, 0)
 		end
 	end
 
