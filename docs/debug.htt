@@ -1,0 +1,138 @@
+% @code
+local C = require "//common.htt"
+local T = require "tags"
+local code = T.code
+local xref = C.xref
+
+% @end
+
+% @component httLibraryLoaderNote
+In this case, that is in the bundled library code  ({{code "[[HTT Library]]"}}), line 432. In the copy of HTT used, this line marks the start of the loader function which HTT installs to intercept calls to {{code 'require "//&lt;path/to/template&gt;.htt'}}, which compile HTT templates into lua modules before loading them in as usual.
+% @end
+
+% @component httCompiledFileNote
+<p class="mb-2">
+Every HTT template file is compiled, and the resulting Lua module is saved on disk. The result of compiling {{code "foo.htt"}} is saved as {{code "foo.out.lua"}} in the same directory.
+~></p>
+
+<p class="mb-2">
+The compiled output should make for easy reading, and sometimes a difficult to understand error becomes obvious when you read the relevant line in the compiled output.
+~></p>
+% @end
+
+
+% @component main
+<p class="mb-4">
+You will make mistakes. Here we will discuss the types of errors you will encounter and how to read the error output.
+~></p>
+
+{{T.h4 "Types of errors"}}
+<p class="mb-2">
+The types of error you will encounter are:
+{{T.beginList}}
+<li>Failure to load the initial script</li>
+<li>Failure to compile some template file</li>
+<li>Failure to load a lua module (whether lua code or a compiled template file)</li>
+<li>Some error during evaluation</li>
+{{T.endList}}
+~></p>
+
+{{T.h2 "How to Read Errors"}}
+<p class="mb-2">
+We will revisit the specifics of this error later, but for now, let's cover some general information on reading the error.
+~></p>
+
+{{@ C.run_htt {script = "examples/debug/run-err-stx.lua"} }}
+
+{{T.h4 "Resolved script fpath/htt root"}}
+<p class="mb-2">
+{{code "script_fpath"}} refers to the script file you used as a starting-point when calling HTT, see {{@ xref {ref="modules-and-files", bookmark="script file", txt="script file"}}} for details.
+~></p>
+
+<p class="mb-2">
+{{code "htt_root"}} refers to the parent directory of the script file. This is the starting-point which is used when importing additional Lua modules or HTT template files, see {{@ xref {ref="modules-and-files", bookmark="htt root", txt="HTT root"}}} for details.
+~></p>
+
+{{T.h4 "References to [HTT Library]"}}
+<p class="mb-2">
+Many lua functions in HTT are provided in addition to the Lua standard API. {{code "[HTT Library]:&lt;number&gt;"}} refers to a line within the {{T.a("https://github.com/jwdevantier/htt/blob/master/src/prelude.lua", "./src/prelude.lua")}}, which holds the definitions for this expanded standard library.
+~></p>
+
+{{T.h4 "How to read the stack trace"}}
+The stack trace is read from bottom (outermost) to top (innermost), meaning the error originated at the line mentioned at the first like after {{code "stack traceback:"}}.
+
+{{@ C.note {c = httLibraryLoaderNote} }}
+
+{{T.h2 "Error Compiling HTT Template"}}
+<p class="mb-2">
+Compile errors happen when a HTT file cannot be compiled to a Lua module because there is a syntax- or semantic error, which the compiler detected.
+~></p>
+
+<p class="mb-2">
+Here's a trivial example. Content (output) cannot appear outside of a component, so the first line causes a compile error:
+~></p>
+{{@ C.include {file = "examples/debug/err-compile.htt"} }}
+
+<p class="mb-2">
+These errors should be the easiest to follow. They point out the file, line- and column number. In case you want to know more, it also prints which parse state the compiler was in when encountering the error:
+~></p>
+
+{{@ C.run_htt {script = "examples/debug/run-err-compile.lua"} }}
+
+{{T.h2 "Error loading Lua module"}}
+<p class="mb-2">
+The initial script is loaded in a special way. For all other modules, whether written in plain Lua or compiled from HTT templates, {{code "Error loading Lua module"}} means the module contains code which is not valid Lua.
+~></p>
+
+<p class="mb-2">
+In this case, we wrote {{code "if x"}}, not {{code "if x then"}} as is required:
+~></p>
+{{@ C.compSrc {file = "//examples/debug/err-stx.htt", component = "one", include_directives = true} }}
+
+
+<p class="mb-2">
+And here is the resulting error:
+~></p>
+
+{{@ C.run_htt {script = "examples/debug/run-err-stx.lua"} }}
+
+<p class="mb-2">
+The stack trace is uninteresting in this case. We see the issue stems from a {{code "require"}} on line 1 of the {{code "start.lua"}} file, which is the intial script we passed to {{code "htt"}}.
+~></p>
+
+<p class="mb-2">
+However, note the error, {{code "Error loading Lua module"}}, and also note the name of the module, {{code "//err-stx.htt"}}, which is a HTT template. For HTT templates, the module name reflects the path with {{code "//"}} being the start of the path, relative to the HTT root directory.
+~></p>
+
+<p class="mb-2">
+The second thing to note is the actual error from Lua, {{code "err-stx.out.lua:7"}}, the result of compiling {{code "err-stx.htt"}} to Lua is saved in {{code "err-stx.out.lua"}}, and the error in the Lua code is on line 7.
+~></p>
+
+<p class="mb-2">
+In this case, the actual error message from Lua, {{code "'then' expected near 'end'"}} is easy to follow. Other times, opening the compiled output is needed. Don't worry, the compiled output is written to be easy to follow.
+~></p>
+
+{{@ C.note { title = "Reading the compiled HTT templates", c = httCompiledFileNote} }}
+
+{{T.h2 "Error during execution"}}
+<p class="mb-2">
+Template code can cause errors. If an error happens, you can determine where by examining the stack.
+~></p>
+
+<p class="mb-2">
+In this example, we have two components, {{code "parent"}} and {{code "child"}}, both defined in {{code "//examples/debug/err-exec.htt"}}. The {{code "parent"}} calls {{code "child"}} which causes a runtime error.
+~></p>
+
+{{@ C.compSrc {file = "//examples/debug/err-exec.htt", component = "parent", include_directives = true} }}
+{{@ C.compSrc {file = "//examples/debug/err-exec.htt", component = "child", include_directives = true} }}
+
+<p class="mb-2">
+Note in output that we see the error itself, and before that, we can see the call-stack for components, {{code "//examples/debug/err-exec.htt.parent"}} is the {{code "parent"}} component, and the stack shows how it calls {{code "//examples/debug/err-exec.htt.child"}} ({{code "child"}}).
+~></p>
+
+{{@ C.run_htt {script = "examples/debug/run-err-exec.lua"} }}
+
+<p class="mb-2">
+~></p>
+
+% @end

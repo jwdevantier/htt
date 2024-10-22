@@ -1,11 +1,11 @@
-
 %local sitename = "HTT Documentation"
 %local conf = require("conf")
 
 % @component xref
 % local page = conf.ref2page[ctx.ref]
 % if page then
-<a href="{{ page.slug }}" class="text-blue-600">{{ ctx.txt or page.title}}</a>
+% local url = page.slug .. (ctx.bookmark and ("#" .. ctx.bookmark) or "")
+<a href="{{ url }}" class="text-blue-600">{{ ctx.txt or page.title}}</a>
 % else
 <a href="#" class="text-red-600">{{ ctx.txt or ctx.ref or "invalid link"}}</a>
 % end
@@ -24,6 +24,36 @@
 
 % @component text
 {{ ctx.text }}
+% @end
+
+% @component run_htt
+% @code
+-- Validate input
+if not ctx.script then
+    error("must provide script to run")
+end
+
+-- Create a temporary file for output capture
+local tmp_output = os.tmpname()
+
+-- Build the command
+local cmd = string.format("%s %s > %s 2>&1",
+    htt.htt_bin(),
+    ctx.script,
+    tmp_output)
+
+-- Run HTT
+local exit_code = os.execute(cmd)
+
+-- Read the output
+local f = io.open(tmp_output, "r")
+local output = f:read("*all")
+f:close()
+
+-- Clean up
+os.remove(tmp_output)
+% @end
+{{@ codebox {c = text, c_args = {text = output} } }}
 % @end
 
 % -- include contents of a file as a text/code box

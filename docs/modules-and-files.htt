@@ -1,0 +1,126 @@
+% @code
+local C = require "//common.htt"
+local T = require "//tags"
+local code = T.code
+local i = T.i
+local xref = C.xref
+% @end
+
+% @component ExLuaPackagePath
+% @code
+content = [[$ cat /tmp/test.lua
+print(package.path)
+$ htt /tmp/test.lua
+/tmp/?.lua;/tmp/?/init.lua;
+]]
+% @end
+{{@ C.codebox {c = C.text, c_args = {text = content} } }}
+% @end
+
+% @component ExRequireLuaModule
+% @code
+local content = [[-- look for "foo.lua" or "foo/init.lua"
+local mod = require("foo")
+
+-- look for "bar/foo.lua" or "bar/foo/init.lua"
+local mod2 = require("bar.foo")
+]]
+% @end
+{{@ C.codebox {c = C.text, c_args = {text = content} } }}
+% @end
+
+% @component ExRequireTemplate
+% @code
+local content = [[
+-- look for "foo.htt", relative to HTT root
+local mod = require("//foo.htt")
+
+-- look for "bar/foo.htt", relative to HTT root
+local mod2 = require("//bar/foo.htt")
+]]
+% @end
+{{@ C.codebox {c = C.text, c_args = {text = content} } }}
+% @end
+
+% @component main
+<p class="mb-2">
+This covers how HTT and indeed Lua resolves and imports code and how this relates to module names. This is important both when debugging errors and laying out your projects.
+~></p>
+
+{{T.h2 "Terminology"}}
+
+{{T.h4 "Template"}}
+<p class="mb-2">
+A template is a {{code "&lt;file&gt;.htt"}} file, written in the {{@ xref {ref="quick-start", txt="HTT template syntax"}}}. HTT will compile this template to a Lua module, {{code "&lt;file&gt;.out.lua"}} when it is first loaded. A template may also have a companion Code file, {{code "&lt;file&gt;.htt.lua"}}, whose contents is {{i "prepended"}} to the compiled module.
+~></p>
+
+{{T.h4 "Module"}}
+<p class="mb-2">
+A module is a Lua concept and is, like a Python module, some unit of code and data. A module is typically a {{code ".lua"}} file which would typically "export" a table of functions and data, defining the module's public API.
+In the broader Lua ecosystem, modules {{i "may"}} be implemented in C or similar by using the C API.
+~></p>
+
+{{T.h4 "Component"}}
+<p class="mb-2">
+A component is a HTT concept. It is a "mini-template", a fragment of templating which can be called and passed around as a function to be rendered inside other components. See more in the {{@ xref {ref="quick-start", bookmark="components"}}}
+~></p>
+
+{{T.bookmark "script file"}}
+{{T.h4 "Script file"}}
+<p class="mb-2">
+By script file, we refer to the {{code "&lt;file&gt;.lua"}} file which is passed to {{code "htt"}} when running the program and which kicks off the code-generation process.
+~></p>
+
+{{T.h2 "Using code from other files"}}
+
+{{T.bookmark "htt root"}}
+{{T.h3 "HTT root"}}
+<p class="mb-2">
+You start the code-generation process by passing a script file to HTT, e.g. {{code "htt &lt;file&gt;.lua"}}.
+As the script is loaded HTT resolves the path to the script file itself, and treats the directory of that file as the {{i "HTT root"}}. All Lua modules and HTT template files are resolved relative to the {{i "HTT root"}} directory.
+~></p>
+
+{{T.h3 "Importing Lua Modules"}}
+<p class="mb-2">
+When importing modules, Lua uses the string in {{code "package.path"}} to build a list of paths to try, in-order. We can see the {{code "package.path"}} by printing it:
+{{@ExLuaPackagePath {} }}
+~></p>
+
+<p class="mb-2">
+Each path in {{code "package.path"}} is separated by {{code ";"}}, with {{code "?"}} being the placeholder which is replaced by the module name (the string argument to {{code "require"}}). 
+~></p>
+
+<p class="mb-2">
+If {{code "package.path"}} is {{code "/tmp/?.lua;/tmp/?/init.lua;"}} and we {{code [[require("foo")]]}}, Lua would:
+<ul class="mt-2 list-disc list-inside mb-4">
+    <li>Try loading {{code "/tmp/foo.lua"}}</li>
+    <li>(Otherwise) Try loading {{code "/tmp/foo/init.lua"}}</li>
+    <li>Raise an error - could not find the module</li>
+</ul>
+
+<p class="mb-2">
+If {{code "package.path"}} is {{code "/tmp/?.lua;/tmp/?/init.lua;"}} and we {{code [[require("foo.bar")]]}}, Lua would:
+<ul class="mt-2 list-disc list-inside mb-4">
+    <li>Try loading {{code "/tmp/foo/bar.lua"}}</li>
+    <li>(Otherwise) Try loading {{code "/tmp/foo/bar/init.lua"}}</li>
+    <li>Raise an error - could not find the module</li>
+</ul>
+
+{{T.h3 "Importing HTT Templates"}}
+<p class="mb-2">
+HTT extends Lua's regular {{code "require"}} function to also work for importing HTT templates. When requiring templates, three things are different from importing regular Lua modules:
+
+<ul class="mt-2 list-disc list-inside mb-4">
+    <li>We start the {{code "require"}} string with {{code "//"}}</li>
+    <li>The separator is {{code "/"}} (instead of Lua's {{code "."}}), also on Windows</li>
+    <li>We also write the {{code ".htt"}} file extension</li>
+</ul>
+~></p>
+
+<p class="mb-2">
+Basically, we write what looks like a relative path, using the Unix path-separator ({{code "/"}}) with {{code "//"}} prefixed.
+~></p>
+
+{{@ExRequireTemplate {} }}
+
+% @end

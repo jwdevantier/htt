@@ -1,0 +1,18 @@
+
+% @component luaLine
+% --[[ lua code here ]]--
+% @end
+
+% @component myComponent
+... content here :)
+% @end
+
+% @component luaCodeBlock
+% @code
+-- lua code here
+% @end
+% @end
+
+% @component luaExpr
+{{hello}}
+% @end

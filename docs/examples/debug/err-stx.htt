@@ -1,0 +1,5 @@
+% @component one
+% local x = false
+% if x
+% end
+% @end

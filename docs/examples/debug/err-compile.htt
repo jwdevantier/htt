@@ -1,0 +1,6 @@
+This line causes a compile failure
+% @component one
+% local x = false
+% if x then
+% end
+% @end

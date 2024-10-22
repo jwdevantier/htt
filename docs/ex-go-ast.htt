@@ -75,7 +75,7 @@ You could add these lines directly to {{code "main"}}. I normally would. But thi
 {{T.h3 "Putting it all together"}}
 
 <p class="mb-2">
-Finally, we call {{code "render_nodes"}} from our {{code "main"}} component. Since we have no data to pass to {{code "render_nodes"}}, we pass an empty lua table ({{code "{}"}}).
+Finally, we call {{code "render_nodes"}} from our {{code "main"}} component. Since we have no data to pass to {{code "render_nodes"}}, we pass an empty Lua table ({{code "{}"}}).
 
 Our main component, thus becomes:
 
@@ -184,7 +184,7 @@ As a next step, I would refactor the model out into its own file, {{code "ast_mo
 To achieve this, we would:
 <ol class="list-decimal list-inside">
   <li>move the model code from {{code "ast.htt.lua"}} to {{code "ast_model.lua"}}</li>
-  <li>in {{code "ast.htt"}}, import the module by adding {{code "% local model = require 'ast_model'"}} to the top of the file</li>
+  <li>in {{code "ast.htt"}}, import the module by adding {{code [[% local model = require 'ast_model']]}} to the top of the file</li>
   <li>in {{code "ast.htt"}}, change the call to {{code "nodes(M)"}} to {{code "model.nodes()"}}</li>
   <li>in {{code "ast_model.lua"}}, import the template module by adding {{code "local tpl = require '//ast.htt'"}} to the top of the file.</li>
   <li>in {{code "ast_model.lua"}}, change all references to the model {{code "m.component"}} to {{code "tpl.component"}}.</li>

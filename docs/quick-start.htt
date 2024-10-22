@@ -41,7 +41,7 @@ HTT interprets lines where text after {{code "%"}} starts with {{code "@"}} diff
 
 {{T.h2 "Hello World"}}
 <p>
-~>HTT takes a single lua script as its argument, from here you can generate as many files as you want by calling the {{code "render"}} function.
+~>HTT takes a single Lua script as its argument, from here you can generate as many files as you want by calling the {{code "render"}} function.
 ~></p>
 <p>Let's create a script, {{code "test-htt.lua"}}:
 ~></p>
@@ -63,10 +63,10 @@ If you now run the command {{code "htt test-htt.lua"}}, then the {{code "result.
 {{T.h3 "To Summarize"}}
 <ol class="list-decimal list-inside">
   <li>We wrote a template file, {{code "helloworld.htt"}}, and defined a component, {{code "helloWorld"}}, inside it</li>
-  <li>We wrote a lua script, {{code "test-htt.lua"}}, which uses the {{code "render"}} call to render a component, {{code "helloWorld"}}, to a file: {{code "result.txt"}}.</li>
+  <li>We wrote a Lua script, {{code "test-htt.lua"}}, which uses the {{code "render"}} call to render a component, {{code "helloWorld"}}, to a file: {{code "result.txt"}}.</li>
 </ol>
 
-{{T.h2 "Using lua inside templates"}}
+{{T.h2 "Using Lua inside templates"}}
 <p>HTT uses plain Lua for all logic inside of templates. Any line which starts with {{code "%"}} is taken to be a line of Lua code injected verbatim into the compiled template.
 ~><p>
 
@@ -94,8 +94,9 @@ If we render this component, we get:
 {{@ C.compSrc {file = qex, component = "varExample"} }}
 {{@ C.eval {file = qex, component = "varExample"}}}
 
-{{@ C.note {title = "What about '% @component'?", c = variablesFromCtxNote} }}
+{{@ C.note {title = "Arguments & components", c = variablesFromCtxNote} }}
 
+{{T.bookmark "components"}}
 {{T.h2 "Components"}}
 <p>Components are the unit of abstraction. Complex outputs should be built by composing smaller components into larger ones.
 ~></p>
@@ -159,7 +160,7 @@ A focus of HTT has been to get indentation "right". Before we summarize how it w
 
 
 {{T.h2 "Line Continuations"}}
-<p>There will be times, usually when mixing output and lua lines, where you want to build up a single line of output across multiple lines in the template.
+<p>There will be times, usually when mixing output and Lua lines, where you want to build up a single line of output across multiple lines in the template.
 ~></p>
 
 <p>If a line starts with {{code "~>"}} (after whitespace), then the line is taken to be a continuation of the preceding line of output.

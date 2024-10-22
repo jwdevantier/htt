@@ -1,0 +1,10 @@
+% @component child
+% error("I am raising an error")
+% @end
+
+% @component parent
+% local x = false
+% if x then
+% end
+Call child {{@ child {} }}
+% @end

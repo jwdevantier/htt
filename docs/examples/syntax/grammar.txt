@@ -1,0 +1,65 @@
+top =
+    | lua-line
+    | component
+    | code
+
+  lua-line =
+    | ws* '%' lua nl
+
+  code =
+    | code-open nl
+    . lua nl
+    . code-close nl
+
+  code-open =
+    | ws* '%' ws+ '@code'
+
+  code-close = 
+    | ws* '%' ws+ '@end'
+
+  component =
+    | component-open nl
+    . component-line
+    . component-close nl
+
+  component-open =
+    | ws* '%' ws+ '@component' component_name
+
+  component_name =
+    | [a-zA-Z_][a-zA-Z0-9_]*
+
+  component-line =
+    | lua-line
+    | text-line
+    | code
+
+  component-close =
+    | ws* '%' ws+ '@end'
+
+  text-line =
+    | ws* line-continuation? element* nl
+
+  line-continuation =
+    | '~>'
+
+  element =
+    | text
+    | expression
+    | component-call
+
+  // here, 'lua' must be a single-line expression.
+  expression =
+    | '{{' lua '}}'
+
+  // here 'lua-table-expr' is some single-line lua expression
+  // which evaluates to a Lua table.
+  component-call =
+    | '{{@' ws* component_name ws+ lua-table-expr '}}'
+
+  ws =
+    | \r
+    | \t
+    | ' '
+
+  nl =
+    | \r? \n

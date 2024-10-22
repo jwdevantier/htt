@@ -99,15 +99,27 @@ end
 -- TODO: expect a '<refid>.htt', main to correspond to a page
 M.site = {
 	Page {
-		title = "Intro",
+		title = "What is HTT?",
 		refid = "htt-intro",
 		slug = ""
 	},
+	Page {
+		title = "Quick Start",
+		refid = "quick-start",
+	},
 	Section {
-		"Usage",
+		"Handbook",
 		Page {
-			title = "Quick Start",
-			refid = "quick-start",
+			title = "Syntax Recap",
+			refid = "syntax-recap",
+		},
+		Page {
+			title = "Debug",
+			refid = "debug"
+		},
+		Page {
+			title = "Modules and files",
+			refid = "modules-and-files"
 		},
 	},
 	Section {
@@ -139,5 +151,6 @@ end
 M.generate_slug = generate_slug
 M.Page = Page
 M.Section = Section
+
 return M
 

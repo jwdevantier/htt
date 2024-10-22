@@ -5,11 +5,8 @@ local code = T.code
 local i = T.i
 % @end
 
-
 % @component main
-Effortlessly generate code or configuration, low-level wizards welcome.
-
-{{T.h2 "What is HTT?"}}
+% -- title is "What is HTT?"
 <p class="mb-2">
 HTT is a code-generator. It is built to help you generate code or configuration files from some high-level description which you either write yourself or get from elsewhere.
 ~></p>
@@ -30,7 +27,7 @@ Think of programs written in different languages exchanging messages with code g
 
 <p class="mb-4">
 Finally, code generation is also an excellent way to address shortcomings of configuration languages like Ansible, terraform, Nix and so on.
-If your DSL files become very long, verbose or difficult to read, perhaps it is time to generate them instead.
+If your DSL files become very long, verbose or difficult to read, perhaps it is time to do some pre-processing in a more capable language, like Lua, and generate simpler DSL files instead.
 ~></p>
 
 % @end

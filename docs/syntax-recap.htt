@@ -1,0 +1,113 @@
+% @code
+local C = require "//common.htt"
+local T = require "//tags"
+local code = T.code
+local i = T.i
+local xref = C.xref
+local raw = T.raw
+
+local stx = "//examples/syntax/examples.htt"
+% @end
+
+
+% @component stxComponent
+{{ raw "% @end"}}
+% @end
+
+% @component noteComponent
+<p class="mb-2">
+Note how for components, the opening tag of the directive take the name of the component as an additional argument.
+~></p>
+% @end
+
+% @component main
+<p class="mb-2">
+This section is just a minimal recap of the HTT templating syntax so you have the proper vocabulary in place and can visually recognize the various parts of the syntax.
+~></p>
+<p class="mb-2">
+To learn how to {{i "apply"}} this syntax and write actual templates, see the {{@ xref {ref="quick-start"} }} guide.
+~></p>
+
+<p class="mb-2">
+Finally, you may actually want to see a condensed grammar definition. If so, click {{@ xref {ref="syntax-recap", bookmark="grammar", txt="here"} }}
+~></p>
+
+{{T.h3 "Literal Text"}}
+<p class="mb-2">
+The majority of the template will probably be literal text.
+Any text which is not triggering any of the syntax rules below is rendered exactly as you typed it in. This is what permits most templates to still be recognizable to people understanding the eventual output.
+~></p>
+
+{{T.h3 "Lua Line"}}
+{{@ C.compSrc {file = stx, component = "luaLine"} }}
+
+<p class="mb-2">
+Lua lines begin with are lines whose first non-whitespace character is {{code "%"}}. The remainder of the line is handled as Lua code and inserted verbatim in the compiled Template's output.
+~></p>
+
+{{T.h3 "Directives"}}
+<p class="mb-2">
+Directives are blocks with a defined start- ({{code "% @&lt;directive type&gt;"}}) and end ({{code "% @end"}}).
+Directives cannot partially overlap, but {{code "code"}}-directives can be nested inside {{code "component"}}-directives.
+~></p>
+
+{{T.h4 "Component"}}
+{{@ C.compSrc {file = stx, component = "myComponent", include_directives = true} }}
+
+<p class="mb-2">
+References to {{code "ctx"}} within the component refers to the Lua table which holds all arguments passed to the component when called.
+~></p>
+
+{{T.h4 "(Lua) Code"}}
+<p class="mb-2">
+You can write blocks of verbatim Lua code by wrapping it in a {{code "@code"}} directive:
+~></p>
+{{@ C.compSrc {file = stx, component = "luaCodeBlock"} }}
+
+{{T.h3 "(Lua) Expressions"}}
+<p class="mb-2">
+Whenever you see {{code "{{ ... }}"}}, it is a Lua expression.
+~></p>
+<p class="mb-2">
+Expressions are evaluated and {{code "tostring()"}} is called on their value and it is this value which is embedded in the output.
+~></p>
+
+{{T.h3 "Component Render Call"}}
+<p class="mb-2">
+Calls of the form {{code "{{&lt;component&gt; &lt;lua-table-expr&gt;}}"}}.
+~></p> 
+
+<p class="mb-2">
+For example, {{code '{{greeting {name = "John"} }}'}} calls the component {{code "greeting"}} with {{code "name"}} set to {{code "John"}}, accessible from within the component as {{code "ctx.name"}}.
+~></p>
+
+{{T.h3 "Line Continuation"}}
+<p class="mb-2">
+Any line which starts with {{code "~>"}} (after optional indentation).
+~></p>
+
+<p class="mb-2">
+It may sound technical, but it is simple. A line continuation is just that, a continuation of the prior line.
+~></p>
+
+
+{{T.bookmark "grammar"}}
+{{T.h2 "Grammar"}}
+<p class="mb-2">
+The following is a definition of the HTT grammar.
+{{T.h4 "How to read the grammar"}}
+{{T.beginUList}}
+<li>{{code "// ..."}} this is a comment</li>
+<li>{{code "&lt;rule-name&gt; ="}} is the start of a rule</li>
+<li>{{code "  | ..."}} - is the start of one (of possibly several) definitions of the rule</li>
+<li>{{code "  . ..."}} - means the definition spans multiple lines and this is the next one</li>
+<li>{{code "&lt;rule&gt;*"}} means 0 or more repetitions of {{code "rule"}}</li>
+<li>{{code "&lt;rule&gt;+"}} means 1 or more repetitions of {{code "rule"}}</li>
+<li>{{code "&lt;rule&gt;?"}} means zero or 1 repetitions of {{code "rule"}}</li>
+<li>{{code "'...'"}} (anything in single-quotes) is a literal value</li>
+{{T.endUList}}
+~></p>
+{{T.h4 "Grammar"}}
+{{@ C.include {file = "examples/syntax/grammar.txt"} }}
+% -- end of document
+% @end
