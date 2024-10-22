@@ -51,6 +51,9 @@ pub fn registerZigFuncs(lua: *Lua) !void {
     lua.pushFunction(ziglua.wrap(misc.api_version));
     lua.setField(-2, "apiVersion");
 
+    lua.pushFunction(ziglua.wrap(misc.htt_bin));
+    lua.setField(-2, "htt_bin");
+
     _ = lua.getField(htt_ndx, "fs");
     lua.pushFunction(ziglua.wrap(dir.fs_cwd));
     lua.setField(-2, "cwd");

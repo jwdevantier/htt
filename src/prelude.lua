@@ -173,6 +173,14 @@ function htt.fs.basename(path)
 	return htt.fs.basename(nxt)
 end
 
+function htt.fs.null_file()
+    if package.config:sub(1,1) == '\\' then
+        return "NUL" -- Windows
+    else -- Unix-like
+        return "/dev/null"
+    end
+end
+
 -- Validation
 -- ------------------------------------------------------------
 -- @section Validation
