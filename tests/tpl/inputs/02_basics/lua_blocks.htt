@@ -1,0 +1,13 @@
+% @code
+local name = "Jane"
+local function greet(name)
+    return string.format("Hello, %s!", name)
+end
+% @end
+
+% @component Main
+% @code
+name = "Anna"
+% @end
+{{ greet(name) }}!
+% @end

@@ -10,7 +10,7 @@ const std = @import("std");
 const ziglua = @import("ziglua");
 
 const dir = @import("engine/dir.zig");
-const misc = @import("engine/misc.zig");
+const env = @import("engine/env.zig");
 const tpl = @import("engine/tpl.zig");
 const json = @import("engine/json.zig");
 
@@ -48,11 +48,7 @@ pub fn registerZigFuncs(lua: *Lua) !void {
     _ = try lua.getGlobal("htt");
     const htt_ndx = lua.getTop();
 
-    lua.pushFunction(ziglua.wrap(misc.api_version));
-    lua.setField(-2, "apiVersion");
-
-    lua.pushFunction(ziglua.wrap(misc.htt_bin));
-    lua.setField(-2, "htt_bin");
+    try env.registerFuncs(lua, htt_ndx);
 
     _ = lua.getField(htt_ndx, "fs");
     lua.pushFunction(ziglua.wrap(dir.fs_cwd));

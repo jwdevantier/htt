@@ -48,16 +48,9 @@ fn dir_makepath(lua: *Lua) i32 {
     return 0;
 }
 
-fn dir_openDir(lua: *Lua) i32 {
-    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
-        lua.pushNil();
-        _ = lua.pushString("NotADir");
-        return 2;
-    };
-    const subpath = lua.checkString(2);
-
+fn openDir(lua: *Lua, self: *TypeDir, sub_path: []const u8) i32 {
     // TODO: are the open flags something we should propagate ?
-    const dir: std.fs.Dir = self.*.handle.openDir(subpath, .{ .iterate = true }) catch |err| {
+    const dir: std.fs.Dir = self.*.handle.openDir(sub_path, .{ .iterate = true }) catch |err| {
         lua.pushNil();
         _ = lua.pushString(@errorName(err));
         return 2;
@@ -70,7 +63,27 @@ fn dir_openDir(lua: *Lua) i32 {
     return 1;
 }
 
-fn dir_iterate_start(l: *Lua) i32 {
+fn dir_openDir(lua: *Lua) i32 {
+    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
+        lua.pushNil();
+        _ = lua.pushString("NotADir");
+        return 2;
+    };
+    const sub_path = lua.checkString(2);
+
+    return openDir(lua, self, sub_path);
+}
+
+fn dir_openParent(lua: *Lua) i32 {
+    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
+        lua.pushNil();
+        _ = lua.pushString("NotADir");
+        return 2;
+    };
+    return openDir(lua, self, "..");
+}
+
+fn dir_list_start(l: *Lua) i32 {
     const self: *TypeDir = l.toUserdata(TypeDir, 1) catch {
         l.pushNil();
         _ = l.pushString("NotADir");
@@ -96,11 +109,11 @@ fn dir_iterate_start(l: *Lua) i32 {
     //    (thus closed) before time
     // 2: the ftype "enum", cached to limit lookups
     // 3: the actual iterator object
-    l.pushClosure(ziglua.wrap(dir_iterate_next), 3);
+    l.pushClosure(ziglua.wrap(list_iterate_next), 3);
     return 1;
 }
 
-fn dir_iterate_next(l: *Lua) i32 {
+fn list_iterate_next(l: *Lua) i32 {
     const it: *std.fs.Dir.Iterator = l.toUserdata(std.fs.Dir.Iterator, Lua.upvalueIndex(3)) catch {
         unreachable;
     };
@@ -180,6 +193,30 @@ fn dir_walk_start(l: *Lua) i32 {
     return ret;
 }
 
+fn stringify_kind(comptime sentinel: ?u8) fn (std.fs.Dir.Entry.Kind) if (sentinel) |s| [:s]const u8 else []const u8 {
+    // all of this comp-time annoyance to allow getting a zero-terminated string
+    // or not:
+    // * stringify_kind(0)(kind) // [:0]const u8
+    // * stringify_kind(null)(kind) // []const u8
+    return struct {
+        fn inner(k: std.fs.Dir.Entry.Kind) if (sentinel) |s| [:s]const u8 else []const u8 {
+            return switch (k) {
+                .block_device => "BLOCK_DEVICE",
+                .character_device => "CHARACTER_DEVICE",
+                .directory => "DIRECTORY",
+                .named_pipe => "NAMED_PIPE",
+                .sym_link => "SYM_LINK",
+                .file => "FILE",
+                .unix_domain_socket => "UNIX_DOMAIN_SOCKET",
+                .whiteout => "WHITEOUT",
+                .door => "DOOR",
+                .event_port => "EVENT_PORT",
+                .unknown => "UNKNOWN",
+            };
+        }
+    }.inner;
+}
+
 fn walk_iterate_next(l: *Lua) i32 {
     const it = l.toUserdata(std.fs.Dir.Walker, Lua.upvalueIndex(4)) catch {
         // we defined the upvalues and their order in `dir_walk_start`
@@ -192,19 +229,7 @@ fn walk_iterate_next(l: *Lua) i32 {
     if (result) |entry| {
         // TODO: push more than name, see std.fs.Dir.Walker.Entry definition
         _ = l.pushString(entry.path);
-        _ = l.getField(ftype_ndx, switch (entry.kind) {
-            .block_device => "BLOCK_DEVICE",
-            .character_device => "CHARACTER_DEVICE",
-            .directory => "DIRECTORY",
-            .named_pipe => "NAMED_PIPE",
-            .sym_link => "SYM_LINK",
-            .file => "FILE",
-            .unix_domain_socket => "UNIX_DOMAIN_SOCKET",
-            .whiteout => "WHITEOUT",
-            .door => "DOOR",
-            .event_port => "EVENT_PORT",
-            .unknown => "UNKNOWN",
-        });
+        _ = l.getField(ftype_ndx, stringify_kind(0)(entry.kind));
         return 2;
     } else {
         const aalloc = l.toUserdata(std.heap.ArenaAllocator, Lua.upvalueIndex(3)) catch {
@@ -218,6 +243,64 @@ fn walk_iterate_next(l: *Lua) i32 {
         l.allocator().destroy(aalloc);
         return 0;
     }
+}
+
+fn dir_remove(lua: *Lua) i32 {
+    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
+        lua.pushNil();
+        _ = lua.pushString("NotADir");
+        return 2;
+    };
+    const sub_path = if (lua.getTop() > 1)
+        lua.checkString(2)
+    else
+        ".";
+
+    self.handle.deleteTree(sub_path) catch |err| {
+        lua.pushNil();
+        _ = lua.pushString(@errorName(err));
+        return 2;
+    };
+    return 0;
+}
+
+fn dir_exists(lua: *Lua) i32 {
+    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
+        lua.pushNil();
+        _ = lua.pushString("NotADir");
+        return 2;
+    };
+
+    const sub_path = if (lua.getTop() > 1)
+        lua.checkString(2)
+    else
+        ".";
+    const stat = self.handle.statFile(sub_path) catch |err| {
+        lua.pushNil();
+        _ = lua.pushString(@errorName(err));
+        return 2;
+    };
+
+    _ = lua.pushString(stringify_kind(null)(stat.kind));
+    return 1;
+}
+
+fn dir_touch(lua: *Lua) i32 {
+    const self: *TypeDir = lua.toUserdata(TypeDir, 1) catch {
+        lua.pushNil();
+        _ = lua.pushString("NotADir");
+        return 2;
+    };
+
+    const sub_path = lua.checkString(2);
+    _ = self.handle.createFile(sub_path, .{ .truncate = false }) catch |err| {
+        lua.pushNil();
+        _ = lua.pushString(@errorName(err));
+        return 2;
+    };
+
+    lua.pushNil();
+    return 1;
 }
 
 /// return `Dir` handle to the current working directory.
@@ -257,11 +340,23 @@ fn dir_metatable(l: *Lua, ndx_dir_tbl: i32) void {
     l.pushFunction(ziglua.wrap(dir_openDir));
     l.setField(-2, "openDir");
 
-    l.pushFunction(ziglua.wrap(dir_iterate_start));
-    l.setField(-2, "iterate");
+    l.pushFunction(ziglua.wrap(dir_openParent));
+    l.setField(-2, "parent");
+
+    l.pushFunction(ziglua.wrap(dir_list_start));
+    l.setField(-2, "list");
 
     l.pushFunction(ziglua.wrap(dir_walk_start));
     l.setField(-2, "walk");
+
+    l.pushFunction(ziglua.wrap(dir_remove));
+    l.setField(-2, "remove");
+
+    l.pushFunction(ziglua.wrap(dir_exists));
+    l.setField(-2, "exists");
+
+    l.pushFunction(ziglua.wrap(dir_touch));
+    l.setField(-2, "touch");
 
     l.pushValue(-1); // dup
     // stack: [<udata>, <mt>, <mt>]

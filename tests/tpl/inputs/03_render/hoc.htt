@@ -1,0 +1,9 @@
+% @component HocComponent
+And now.
+{{@ ctx.child {heading = ctx.text} }}
+Done.
+% @end
+
+% @component MdH1
+# {{ctx.heading}}
+% @end

@@ -1,0 +1,9 @@
+% @component Child
+Hello {{ctx.name or "<unset>"}}
+% @end
+
+% -- the following also demonstrates the render call
+% @component Parent
+Parent says:
+{{@ Child ctx }}
+% @end

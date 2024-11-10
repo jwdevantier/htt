@@ -1,0 +1,4 @@
+% -- HINT: look in tpl_with_lua.htt.lua
+% @component Main
+Hello {{name}}
+% @end

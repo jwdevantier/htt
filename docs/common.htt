@@ -12,6 +12,21 @@
 % @end
 
 % @component codebox
+% @code
+local style = ""
+if ctx.highlight then
+    -- background here must match style chosen in docs/highlighter.js
+    --   * change theme
+    --   * re-render, inspect code box/shiki node for background value
+    --   * update colorReplacements entry that one entry is the default theme BG
+    --     OR remove if you are happy with the default BG
+    --   * update background color here to match theme bg
+    style = [[style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="]]
+else
+    style = [[class="bg-stone-100 ]]
+end
+style = style .. [[p-4 rounded-md"]]
+% @end
 % -- render a nice box for the code
 <div class="code-container relative my-4">
     <div class="bg-stone-100 p-4 rounded-md">
@@ -38,7 +53,7 @@ local tmp_output = os.tmpname()
 
 -- Build the command
 local cmd = string.format("%s %s > %s 2>&1",
-    htt.htt_bin(),
+    htt.env.htt_path(),
     ctx.script,
     tmp_output)
 

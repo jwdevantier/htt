@@ -9,6 +9,7 @@
 
 
 htt = {}
+htt.env = {}
 htt.str = {}
 htt.fs = {}
 htt.tpl = {}
@@ -154,7 +155,13 @@ function htt.fs.path(s)
 end
 
 function htt.fs.path_join(...)
-	return table.concat({ ... }, htt.fs.sep)
+	local tbl = {}
+	for _, v in ipairs({ ... }) do
+		if v ~= "." then
+			table.insert(tbl, v)
+		end
+	end
+	return table.concat(tbl, htt.fs.sep)
 end
 
 function htt.fs.dirname(path)
@@ -174,11 +181,11 @@ function htt.fs.basename(path)
 end
 
 function htt.fs.null_file()
-    if package.config:sub(1,1) == '\\' then
-        return "NUL" -- Windows
-    else -- Unix-like
-        return "/dev/null"
-    end
+	if package.config:sub(1, 1) == '\\' then
+		return "NUL" -- Windows
+	else        -- Unix-like
+		return "/dev/null"
+	end
 end
 
 -- Validation
@@ -379,8 +386,24 @@ end
 
 function htt.tpl.render(writeFn, c_, ctx_)
 	local stack = {}
-	-- TODO: determine how come we write an initial newline whether fresh_line is true or false
-	local fresh_line = false
+
+	-- NL handling:
+	-- Each component starts with a call to fl(<indent>) where <indent>
+	-- is the indentation of the first line of content in the component.
+	--
+	-- We track fresh_line and nl globally, outside the stack of render contexts.
+	-- We start with frsh_line=true, nl=false, to ensure text for the first line of
+	-- output IS properly indented (fresh_line true) but is NOT generating a leading
+	-- empty line (nl false).
+	--
+	-- We then only set NL true iff an fl() call occurs when we're on a 'dirty'
+	-- (i.e. non-fresh) line.
+	--
+	-- TODO: likely to print _line_indent on first print in a component iff on a
+	--       dirty line. Otherwise we effectively l-strip component output
+	--
+	local fresh_line = true
+	local nl = false
 
 	local function render_(component, context)
 		local parent = stack[#stack]
@@ -391,28 +414,43 @@ function htt.tpl.render(writeFn, c_, ctx_)
 			_line_indent = ""
 		}
 
-		local ignore = true
-
 		-- define API
-		rctx.fl = function(indent)
-			if not ignore then
-				fresh_line = true
-				rctx._line_indent = indent
-			else
-				ignore = false
+		local fl_normal = function(indent)
+			rctx._line_indent = indent
+			if not fresh_line then
+				nl = true
 			end
+			fresh_line = true
+		end
+
+		rctx.fl = function(indent)
+			rctx._line_indent = indent
+			rctx.fl = fl_normal
 		end
 
 		rctx.cont = function()
 			fresh_line = false
 		end
 
-		rctx.write = function(...)
+		-- used after first call to write in component
+		local write_normal = function(...)
 			if fresh_line then
-				writeFn("\n", rctx._base_indent, rctx._line_indent, ...)
+				writeFn(nl and "\n" or "", rctx._base_indent, rctx._line_indent, ...)
 				fresh_line = false
+				nl = false
 			else
 				writeFn(...)
+			end
+		end
+
+		rctx.write = function(...)
+			rctx.write = write_normal
+			if not fresh_line then
+				-- if called as inline component, do retain own line-indentation
+				writeFn(rctx._line_indent, ...)
+			else
+				-- delegate
+				rctx.write(...)
 			end
 		end
 

@@ -59,7 +59,14 @@ fn doString(lua: *Lua, name: [:0]const u8, buf: []const u8) !void {
     };
 }
 
-fn doRun(script_fpath_: []const u8) !void {
+fn resolveOutDirPath(a: Allocator, out_dir_arg: ?[]const u8) !?[]const u8 {
+    if (out_dir_arg) |out_dir_path| {
+        const cwd = try std.fs.cwd().realpathAlloc(a, ".");
+        return try std.fs.path.resolve(a, &[_][]const u8{ cwd, out_dir_path });
+    } else return null;
+}
+
+fn doRun(script_fpath_: []const u8, out_dir_arg: ?[]const u8) !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -76,6 +83,9 @@ fn doRun(script_fpath_: []const u8) !void {
     const htt_root = try engine.resolvePath(aai, std.fs.path.dirname(script_fpath_) orelse ".");
     std.debug.print("resolved htt_root: '{s}'\n", .{htt_root});
     defer aai.free(htt_root);
+
+    const out_dir = try resolveOutDirPath(aai, out_dir_arg);
+    defer if (out_dir) |slice| aai.free(slice);
 
     // change working directory
     var htt_root_hndl = try std.fs.cwd().openDir(htt_root, .{});
@@ -101,6 +111,14 @@ fn doRun(script_fpath_: []const u8) !void {
     // this permits documenting stubs using ldoc
     try engine.registerZigFuncs(lua);
 
+    // expose out directory to Lua side, not part of end-user API though
+    if (out_dir) |val| {
+        _ = lua.pushString(val);
+    } else {
+        _ = lua.pushString(htt_root);
+    }
+    lua.setGlobal("HTT_OUT_PATH");
+
     const htt_prelude = @embedFile("./htt_prelude.lua");
     try doString(lua, "HTT Loader", htt_prelude);
 
@@ -115,8 +133,8 @@ fn doRun(script_fpath_: []const u8) !void {
     }
 }
 
-fn run(script_fpath: []const u8) !void {
-    doRun(script_fpath) catch |err| {
+fn run(script_fpath: []const u8, out_dir: ?[]const u8) !void {
+    doRun(script_fpath, out_dir) catch |err| {
         switch (err) {
             // errors where we have informed the user, but can do nothing more
             error.ErrorHandled => {},
@@ -134,12 +152,13 @@ pub fn main() !void {
 
     var htt = app.rootCommand();
 
+    try htt.addArg(Arg.singleValueOption("out-dir", 'o', "directory where files are rendered out to (default: same as script file)"));
     try htt.addArg(Arg.positional("script", "path to your script", null));
     const matches = try app.parseProcess();
 
     if (matches.containsArg("script")) {
         const script_fpath = matches.getSingleValue("script").?;
-        run(script_fpath) catch {
+        run(script_fpath, matches.getSingleValue("out-dir")) catch {
             std.process.exit(1);
         };
     } else {

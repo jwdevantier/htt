@@ -1,0 +1,46 @@
+% @component LeafFlat1
+LeafFlat1#1
+% @end
+
+% @component LeafFlat2
+LeafFlat2#1
+LeafFlat2#2
+% @end
+
+% @component LeafIndent1
+  LeafIndent1#1
+LeafIndent1#2
+% @end
+
+% @component LeafIndent2
+LeafIndent2#1
+  LeafIndent2#2
+% @end
+
+% @component LeafIndentBoth
+  LeafIndentBoth#1
+  LeafIndentBoth#2
+% @end
+
+% @component NodeFlat1
+{{@ ctx.child {} }}
+% @end
+
+% @component NodeFlat2
+.
+{{@ ctx.child {} }}
+% @end
+
+% @component NodeIndent1
+  {{@ ctx.child {} }}
+% @end
+
+% @component NodeIndent2
+.
+  {{@ ctx.child {} }}
+% @end
+
+% @component NodeIndentBoth
+  .
+  {{@ ctx.child {} }}
+% @end

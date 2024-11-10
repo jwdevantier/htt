@@ -1,0 +1,35 @@
+% @component InnerFlat1
+InnerFlat1#1
+% @end
+
+% @component InnerFlat2
+InnerFlat2#1
+InnerFlat2#2
+% @end
+
+% @component InnerIndent1
+  InnerIndent1#1
+% @end
+
+% @component InnerIndent2
+  InnerIndent2#1
+  InnerIndent2#2
+% @end
+
+% @component OuterFlat1
+OF1({{@ ctx.child {} }})
+% @end
+
+% @component OuterFlat2
+OF2({{@ ctx.child {} }})
+OF2({{@ ctx.child {} }})
+% @end
+
+% @component OuterIndent1
+  OI1({{@ ctx.child {} }})
+% @end
+
+% @component OuterIndent2
+  OI2({{@ ctx.child {} }})
+  OI2({{@ ctx.child {} }})
+% @end

@@ -1,0 +1,10 @@
+% -- Render component `Child` from `Parent`.
+% --
+% -- Note, order matters, must define Child before Parent (ordinarily, see advanced)
+% @component Child
+Hello, from child
+% @end
+
+% @component Parent
+{{@ Child {} }}
+% @end

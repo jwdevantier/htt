@@ -1,0 +1,23 @@
+% @component Main
+% local name = "John"
+Hello, {{name}}!
+% name = "Jane"
+Hello, {{name}}!
+% @end
+
+% @component LuaLineLoop
+% for i = 1, 3 do
+{{i}} missisipi!
+% end
+Done!
+% @end
+
+% @component ConditionalRender
+% if ctx.show == true then
+I will show you
+% elseif ctx.show == false then
+I will NOT show you
+% else
+Hmm, I am unsure of you
+% end
+% @end

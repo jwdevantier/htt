@@ -43,18 +43,21 @@ docs-dev: htt  ## run local docs development server
 	@echo "now run '$(MAKE) docs-gen' to re-render example" 
 	cd docs/out; python -m http.server 1314
 
-.PHONY: test-base
-test-base:  ## run application unit tests
+.PHONY: test-zig
+test-zig:  ## run application unit tests
 	@echo "running base HTT tests"
 	zig build test
 
 .PHONY: test-api
-test-api:  ## test exposed Lua API
-	@echo "test HTT API"
-	zig build
-	./zig-out/bin/htt ./tests/run_tests.lua
+test-api: htt  ## test exposed Lua API
+	@echo "lua unit tests"
+	$(HTT) ./tests/unit/run_tests.lua  # API Unit tests
+
+.PHONY: test-tpl
+test-tpl: htt  ## tests using the HTTP templating language
+	@echo "HTT templating tests"
+	$(HTT) ./tests/tpl/run_tests.lua   # HTT template tests
 
 .PHONY: test
-test:  ## run all tests
-	test-base
-	test-api
+test: htt test-zig test-api test-tpl  ## run all tests
+	@echo "remember to 'make clean' first to rebuild HTT"

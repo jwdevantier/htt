@@ -1,0 +1,15 @@
+% @component Top
+{{ ctx.name or "unset" }}
+% @end
+
+% @component Child
+Hello, my name is {{ctx.name}}, I am a {{ctx.profession}} by trade.
+% @end
+
+% @component CtxPassthrough
+{{@ Child ctx }}
+% @end
+
+% @component CtxFromComponent
+{{@ Child {name = "Jane", profession = "painter"} }}
+% @end

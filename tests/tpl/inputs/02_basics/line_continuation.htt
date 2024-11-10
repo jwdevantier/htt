@@ -1,0 +1,21 @@
+% @component Simple
+Hello
+~>World!
+
+Hello 
+~>World!
+
+Hello
+~> World!
+
+Hello 
+~> World!
+% @end
+
+% @component Array
+[ 1
+% for i = 2, 3 do
+~>, {{i}}
+% end
+~> ]
+% @end

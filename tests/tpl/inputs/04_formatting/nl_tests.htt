@@ -1,0 +1,50 @@
+
+% @component L1
+
+l1
+% @end
+
+% @component L2
+
+
+l2
+% @end
+
+% @component T1
+t1
+
+% @end
+
+% @component T2
+t2
+
+
+% @end
+
+% @component L1T1
+
+l1t1
+
+% @end
+
+% @component L2T2
+
+
+l2t2
+
+
+% @end
+
+% @component Outer
+---
+{{@ ctx.child {} }}
+---
+% @end
+
+% @component OuterInline1
+---{{@ ctx.child {} }}---
+% @end
+
+% @component OuterInline2
+---{{@ ctx.child {} }}---
+% @end

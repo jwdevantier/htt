@@ -1,0 +1,8 @@
+
+% @component Main
+hello world!
+% @end
+
+% @component LuaExpr
+2 + 2 is {{2 + 2}}
+% @end
