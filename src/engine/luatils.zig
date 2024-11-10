@@ -10,3 +10,15 @@ pub fn wrapGcFn(comptime T: type, comptime typeName: [:0]const u8, comptime f: f
         }
     }.inner;
 }
+
+pub fn checkUsize(l: *Lua, ndx: i32) usize {
+    const ival = l.checkInteger(ndx); // TODO: check and catch ourselves, to have same err msg
+    if (ival < 0) {
+        l.typeError(ndx, "usize");
+    }
+    return @as(usize, @intCast(ival));
+}
+
+pub fn pushUsize(l: *Lua, val: usize) void {
+    l.pushInteger(@as(c_longlong, @intCast(val)));
+}

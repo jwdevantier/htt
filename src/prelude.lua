@@ -11,6 +11,8 @@
 htt = {}
 htt.env = {}
 htt.str = {}
+htt.tcp = {}
+htt.time = {}
 htt.fs = {}
 htt.tpl = {}
 htt.is = {}
@@ -126,6 +128,10 @@ function htt.dofile_with_tb(script_fpath)
 	end
 	return result, nil
 end
+
+-- TCP
+-- ------------------------------------------------------------
+
 
 -- FS
 -- ------------------------------------------------------------

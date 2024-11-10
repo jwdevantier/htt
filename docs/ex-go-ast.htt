@@ -50,7 +50,7 @@ For small, self-contained projects, we can embed the model with the template. Wh
 
 <p class="mb-2">
 Hence, here is the {{code "ast.htt.lua"}} file to accompany our {{code "ast.htt"}} template file:
-{{@ C.include {file = "examples/ast/ast2.htt.lua"} }}
+{{@ C.include {file = "examples/ast/ast2.htt.lua", lang = "lua"} }}
 ~></p>
 
 <p class="mb-2">

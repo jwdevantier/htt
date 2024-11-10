@@ -29,7 +29,7 @@ style = style .. [[p-4 rounded-md"]]
 % @end
 % -- render a nice box for the code
 <div class="code-container relative my-4">
-    <div class="bg-stone-100 p-4 rounded-md">
+    <div {{style}}>
         <div class="overflow-x-auto">
 <pre class="code-block text-sm"><code class="text-gray-800">{{@ ctx.c ctx.c_args }}</code></pre>
         </div>
@@ -73,14 +73,23 @@ os.remove(tmp_output)
 
 % -- include contents of a file as a text/code box
 % @component include
-% local content
-% local file = io.open(ctx.file, "r")
-% if file then
-% -- this actually circumvents the indentation provided by htt
-% -- this is a rare case of actually wanting that
-{{@ codebox {c = text, c_args = {text = file:read("*all")} } }}
-% file:close()
-% end
+% @code
+local content
+local use_highlighter = false
+local file = io.open(ctx.file, "r")
+if file then
+    local content = file:read("*all")
+    if ctx.lang then
+        local highlighter = require('highlight')
+        content = highlighter.highlight_code(content, ctx.lang)
+        use_highlighter = true
+    end
+% @end
+{{@ codebox {c = text, c_args = {text = content}, highlight = use_highlighter } }}
+% @code
+    file:close()
+end
+% @end
 % @end
 
 % -- produce a code box listing the contents of a particular component
@@ -93,11 +102,12 @@ if ctx.include_directives ~= nil then
 else
     include_directives = false
 end
+local content = extract_component_source(fpath, ctx.component, include_directives)
+content = require('highlight').highlight_code(content, "htt")
 % @end
-% local content = extract_component_source(fpath, ctx.component, include_directives)
 % -- this actually circumvents the indentation provided by htt
 % -- this is a rare case of actually wanting that
-{{@ codebox {c = text, c_args = {text = content} } }}
+{{@ codebox {c = text, c_args = {text = content}, highlight = true } }}
 % @end
 
 % -- evaluate component with args, show output as text/code box

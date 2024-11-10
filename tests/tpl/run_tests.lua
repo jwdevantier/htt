@@ -127,7 +127,7 @@ end
 -- Rest of the script remains largely the same
 local function check_prerequisites()
 	-- Check git availability
-	local git_check = os.execute("git --version > /dev/null 2>&1")
+	local git_check = os.execute("git --version")
 	if git_check ~= true then
 		error("git must be available to run tests")
 	end

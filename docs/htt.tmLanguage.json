@@ -1,0 +1,135 @@
+{
+  "name": "HTT",
+  "scopeName": "source.htt",
+  "patterns": [
+    {
+      "include": "#lua-code-block"
+    },
+    {
+      "include": "#directive-line"
+    },
+    {
+      "include": "#lua-line"
+    },
+    {
+      "include": "#lua-expression"
+    },
+    {
+      "include": "#render-call"
+    },
+    {
+      "include": "#line-continuation"
+    }
+  ],
+  "repository": {
+    "lua-code-block": {
+      "begin": "^(\\s*%\\s*)(@code)\\s*$",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.directive.htt"
+        },
+        "2": {
+          "name": "keyword.control.directive.htt"
+        }
+      },
+      "end": "^(\\s*%\\s*)(@end)\\s*$",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.directive.htt"
+        },
+        "2": {
+          "name": "keyword.control.directive.htt"
+        }
+      },
+      "name": "meta.embedded.block.lua",
+      "patterns": [
+        {
+          "include": "source.lua"
+        }
+      ]
+    },
+    "directive-line": {
+      "match": "^(\\s*%\\s*)(@\\w+)\\s*(.*)",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.directive.htt"
+        },
+        "2": {
+          "name": "keyword.control.directive.htt"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "source.lua"
+            }
+          ]
+        }
+      }
+    },
+    "lua-line": {
+      "begin": "^\\s*%((?!@))",
+      "end": "$",
+      "name": "meta.embedded.lua",
+      "patterns": [
+        {
+          "include": "source.lua"
+        }
+      ]
+    },
+    "lua-expression": {
+      "begin": "({{)(?!@)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.begin.htt"
+        }
+      },
+      "end": "(}})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.end.htt"
+        }
+      },
+      "name": "meta.embedded.line.lua",
+      "patterns": [
+        {
+          "include": "source.lua"
+        }
+      ]
+    },
+    "render-call": {
+      "begin": "({{)(@)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.begin.htt"
+        },
+        "2": {
+          "name": "keyword.control.htt"
+        }
+      },
+      "end": "(}})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.end.htt"
+        }
+      },
+      "name": "meta.function-call.htt",
+      "patterns": [
+        {
+          "match": "\\s+(\\w+)",
+          "name": "entity.name.function.htt"
+        },
+        {
+          "include": "source.lua"
+        }
+      ]
+    },
+    "line-continuation": {
+      "match": "^(\\s*)(~>)",
+      "captures": {
+        "2": {
+          "name": "comment.line.continuation.htt"
+        }
+      }
+    }
+  }
+}

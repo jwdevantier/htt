@@ -7,3 +7,4 @@ PLAN.md
 .test-output
 *.out.lua
 *.tmp
+node_modules

@@ -42,8 +42,9 @@ fn dir_makepath(lua: *Lua) i32 {
     const subpath = lua.checkString(2);
 
     self.*.handle.makePath(subpath) catch |err| {
+        lua.pushNil();
         _ = lua.pushString(@errorName(err));
-        return 1;
+        return 2;
     };
     return 0;
 }
@@ -363,6 +364,7 @@ fn dir_metatable(l: *Lua, ndx_dir_tbl: i32) void {
     // here, we pop -1 (mt) and associate it to the __index key of -2 (mt, itself).
     l.setField(-2, "__index");
 
+    // [<udata> <mt>], now assign <mt> as <mt> of <udata>
     l.setMetatable(-2);
     l.setTop(top);
 }
