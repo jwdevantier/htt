@@ -13,6 +13,8 @@ const dir = @import("engine/dir.zig");
 const misc = @import("engine/misc.zig");
 const tpl = @import("engine/tpl.zig");
 const json = @import("engine/json.zig");
+const proc = @import("engine/proc.zig");
+const fs = @import("engine/fs.zig");
 
 const Allocator = std.mem.Allocator;
 const Lua = ziglua.Lua;
@@ -54,9 +56,16 @@ pub fn registerZigFuncs(lua: *Lua) !void {
     lua.pushFunction(ziglua.wrap(misc.htt_bin));
     lua.setField(-2, "htt_bin");
 
+    _ = lua.getField(htt_ndx, "proc");
+    lua.pushFunction(ziglua.wrap(proc.fs_proc));
+    lua.setField(-2, "new");
+
     _ = lua.getField(htt_ndx, "fs");
     lua.pushFunction(ziglua.wrap(dir.fs_cwd));
     lua.setField(-2, "cwd");
+
+    lua.pushFunction(ziglua.wrap(fs.fsSelect));
+    lua.setField(-2, "select");
 
     _ = lua.pushString(std.fs.path.sep_str);
     lua.setField(-2, "sep");

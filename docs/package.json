@@ -1,0 +1,9 @@
+{
+  "name": "htt-docs-highlighter",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "shiki": "^1.22.0"
+  }
+}

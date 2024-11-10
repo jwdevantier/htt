@@ -10,6 +10,7 @@
 
 htt = {}
 htt.str = {}
+htt.proc = {}
 htt.fs = {}
 htt.tpl = {}
 htt.is = {}
@@ -125,6 +126,22 @@ function htt.dofile_with_tb(script_fpath)
 	end
 	return result, nil
 end
+
+-- PROC
+-- ------------------------------------------------------------
+-- Get a handle to a new process. The process is not yet started
+-- or configured.
+-- @return process handle, configure before starting
+function htt.proc.new()
+	-- STUB
+end
+
+htt.proc.StreamBehavior = {
+	INHERIT = 0,
+	IGNORE = 1,
+	PIPE = 2,
+	CLOSE = 3,
+}
 
 -- FS
 -- ------------------------------------------------------------
