@@ -1,3 +1,5 @@
+local SITE_PREFIX = os.getenv("SITE_PREFIX") or "/"
+
 local time_start = htt.time.timestamp_ms()
 local conf = require("conf")
 
@@ -24,7 +26,7 @@ local renderPage = function(page, section)
 	local tpl = require("//" .. page.refid .. ".htt")
 
 	-- slug is also the dirpath, so create it in the out dir
-	local out_dir = htt.fs.path("out" .. "/" .. page.slug)
+	local out_dir = htt.fs.path("out" .. "/" .. string.sub(page.slug, #SITE_PREFIX + 1))
 	cwd:makePath(out_dir)
 	local out_file = htt.fs.path_join(out_dir, "index.html")
 
@@ -45,7 +47,7 @@ local preRender = function(page, section)
 	else
 		slug = page.slug
 	end
-	page.slug = "/" .. slug
+	page.slug = SITE_PREFIX .. slug
 end
 
 for _, entry in ipairs(conf.site) do
