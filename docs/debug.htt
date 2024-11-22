@@ -1,6 +1,7 @@
 % @code
 local C = require "//common.htt"
 local T = require "tags"
+local e = require "elems"
 local code = T.code
 local xref = C.xref
 
@@ -29,12 +30,17 @@ You will make mistakes. Here we will discuss the types of errors you will encoun
 {{T.h4 "Types of errors"}}
 <p class="mb-2">
 The types of error you will encounter are:
-{{T.beginList}}
-<li>Failure to load the initial script</li>
-<li>Failure to compile some template file</li>
-<li>Failure to load a lua module (whether lua code or a compiled template file)</li>
-<li>Some error during evaluation</li>
-{{T.endList}}
+% @code
+local issues = e.ul {
+  e.li {"Failure to load the initial script"},
+  e.li {"Failue to compile some template file"},
+  e.li {"Failure to load a lua module", e.ul {
+    e.li {"Whether Lua code or a compiled template file"}
+  }},
+  e.li {"An error during evaluation of the Lua code"},
+}
+% @end
+{{@ C.list issues }}
 ~></p>
 
 {{T.h2 "How to Read Errors"}}
@@ -55,7 +61,7 @@ We will revisit the specifics of this error later, but for now, let's cover some
 
 {{T.h4 "References to [HTT Library]"}}
 <p class="mb-2">
-Many lua functions in HTT are provided in addition to the Lua standard API. {{code "[HTT Library]:&lt;number&gt;"}} refers to a line within the {{T.a("https://github.com/jwdevantier/htt/blob/master/src/prelude.lua", "./src/prelude.lua")}}, which holds the definitions for this expanded standard library.
+Many lua functions in HTT are provided in addition to the Lua standard API. {{code "[HTT Library]:&lt;number&gt;"}} refers to a line within the {{@ C.url { ref = "https://github.com/jwdevantier/htt/blob/master/src/prelude.lua", label = "./src/prelude.lua"}}}, which holds the definitions for this expanded standard library.
 ~></p>
 
 {{T.h4 "How to read the stack trace"}}

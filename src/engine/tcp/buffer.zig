@@ -54,147 +54,141 @@ fn bMetaTable(l: *Lua, obj_tbl_ndx: i32) void {
 
     // set new capacity, will shrink or grow as needed, might fail
     l.pushFunction(ziglua.wrap(bSetSize));
-    l.setField(-2, "setSize");
+    l.setField(-2, "set_size");
 
     l.pushFunction(ziglua.wrap(bSeek));
     l.setField(-2, "seek");
 
-    l.pushFunction(ziglua.wrap(bSeekStart));
-    l.setField(-2, "seek_start");
-
-    l.pushFunction(ziglua.wrap(bSeekEnd));
-    l.setField(-2, "seek_end");
-
     l.pushFunction(ziglua.wrap(bTell));
     l.setField(-2, "tell");
 
+    // Misc writers
+    l.pushFunction(ziglua.wrap(bWriteString));
+    l.setField(-2, "write_string");
+
+    l.pushFunction(ziglua.wrap(bWriteBool));
+    l.setField(-2, "write_bool");
+
     // Native-endian writers
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u8, asNative)));
-    l.setField(-2, "writeU8");
+    l.setField(-2, "write_u8");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u16, asNative)));
-    l.setField(-2, "writeU16");
+    l.setField(-2, "write_u16");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u32, asNative)));
-    l.setField(-2, "writeU32");
+    l.setField(-2, "write_u32");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u64, asNative)));
-    l.setField(-2, "writeU64");
+    l.setField(-2, "write_u64");
 
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i8, asNative)));
-    l.setField(-2, "writeI8");
+    l.setField(-2, "write_i8");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i16, asNative)));
-    l.setField(-2, "writeI16");
+    l.setField(-2, "write_i16");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i32, asNative)));
-    l.setField(-2, "writeI32");
+    l.setField(-2, "write_i32");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i64, asNative)));
-    l.setField(-2, "writeI64");
+    l.setField(-2, "write_i64");
 
     // Little-endian writers
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u8, std.mem.nativeToLittle)));
-    l.setField(-2, "writeU8Le");
+    l.setField(-2, "write_u8le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u16, std.mem.nativeToLittle)));
-    l.setField(-2, "writeU16Le");
+    l.setField(-2, "write_u16le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u32, std.mem.nativeToLittle)));
-    l.setField(-2, "writeU32Le");
+    l.setField(-2, "write_u32le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u64, std.mem.nativeToLittle)));
-    l.setField(-2, "writeU64Le");
+    l.setField(-2, "write_u64le");
 
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i8, std.mem.nativeToLittle)));
-    l.setField(-2, "writeI8Le");
+    l.setField(-2, "write_i8le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i16, std.mem.nativeToLittle)));
-    l.setField(-2, "writeI16Le");
+    l.setField(-2, "write_i16le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i32, std.mem.nativeToLittle)));
-    l.setField(-2, "writeI32Le");
+    l.setField(-2, "write_i32le");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i64, std.mem.nativeToLittle)));
-    l.setField(-2, "writeI64Le");
+    l.setField(-2, "write_i64le");
 
     // Big-endian writers
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u8, std.mem.nativeToBig)));
-    l.setField(-2, "writeU8Be");
+    l.setField(-2, "write_u8be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u16, std.mem.nativeToBig)));
-    l.setField(-2, "writeU16Be");
+    l.setField(-2, "write_u16be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u32, std.mem.nativeToBig)));
-    l.setField(-2, "writeU32Be");
+    l.setField(-2, "write_u32be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(u64, std.mem.nativeToBig)));
-    l.setField(-2, "writeU64Be");
+    l.setField(-2, "write_u64be");
 
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i8, std.mem.nativeToBig)));
-    l.setField(-2, "writeI8Be");
+    l.setField(-2, "write_i8be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i16, std.mem.nativeToBig)));
-    l.setField(-2, "writeI16Be");
+    l.setField(-2, "write_i16be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i32, std.mem.nativeToBig)));
-    l.setField(-2, "writeI32Be");
+    l.setField(-2, "write_i32be");
     l.pushFunction(ziglua.wrap(WriteIntFn.get(i64, std.mem.nativeToBig)));
-    l.setField(-2, "writeI64Be");
-
-    // Misc writers
-    l.pushFunction(ziglua.wrap(bWriteString));
-    l.setField(-2, "writeString");
-
-    l.pushFunction(ziglua.wrap(bWriteBool));
-    l.setField(-2, "writeBool");
+    l.setField(-2, "write_i64be");
 
     // Native-endian readers
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u8, asNative)));
-    l.setField(-2, "readU8");
+    l.setField(-2, "read_u8");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u16, asNative)));
-    l.setField(-2, "readU16");
+    l.setField(-2, "read_u16");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u32, asNative)));
-    l.setField(-2, "readU32");
+    l.setField(-2, "read_u32");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u64, asNative)));
-    l.setField(-2, "readU64");
+    l.setField(-2, "read_u64");
 
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i8, asNative)));
-    l.setField(-2, "readI8");
+    l.setField(-2, "read_i8");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i16, asNative)));
-    l.setField(-2, "readI16");
+    l.setField(-2, "read_i16");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i32, asNative)));
-    l.setField(-2, "readI32");
+    l.setField(-2, "read_i32");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i64, asNative)));
-    l.setField(-2, "readI64");
+    l.setField(-2, "read_i64");
 
     // Little-endian readers
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u8, std.mem.nativeToLittle)));
-    l.setField(-2, "readU8Le");
+    l.setField(-2, "read_u8le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u16, std.mem.nativeToLittle)));
-    l.setField(-2, "readU16Le");
+    l.setField(-2, "read_u16le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u32, std.mem.nativeToLittle)));
-    l.setField(-2, "readU32Le");
+    l.setField(-2, "read_u32le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u64, std.mem.nativeToLittle)));
-    l.setField(-2, "readU64Le");
+    l.setField(-2, "read_u64le");
 
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i8, std.mem.nativeToLittle)));
-    l.setField(-2, "readI8Le");
+    l.setField(-2, "read_i8le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i16, std.mem.nativeToLittle)));
-    l.setField(-2, "readI16Le");
+    l.setField(-2, "read_i16le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i32, std.mem.nativeToLittle)));
-    l.setField(-2, "readI32Le");
+    l.setField(-2, "read_i32le");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i64, std.mem.nativeToLittle)));
-    l.setField(-2, "readI64Le");
+    l.setField(-2, "read_i64le");
 
     // Big-endian readers
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u8, std.mem.nativeToBig)));
-    l.setField(-2, "readU8Be");
+    l.setField(-2, "read_u8be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u16, std.mem.nativeToBig)));
-    l.setField(-2, "readU16Be");
+    l.setField(-2, "read_u16be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u32, std.mem.nativeToBig)));
-    l.setField(-2, "readU32Be");
+    l.setField(-2, "read_u32be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(u64, std.mem.nativeToBig)));
-    l.setField(-2, "readU64Be");
+    l.setField(-2, "read_u64be");
 
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i8, std.mem.nativeToBig)));
-    l.setField(-2, "readI8Be");
+    l.setField(-2, "read_i8be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i16, std.mem.nativeToBig)));
-    l.setField(-2, "readI16Be");
+    l.setField(-2, "read_i16be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i32, std.mem.nativeToBig)));
-    l.setField(-2, "readI32Be");
+    l.setField(-2, "read_i32be");
     l.pushFunction(ziglua.wrap(ReadIntFn.get(i64, std.mem.nativeToBig)));
-    l.setField(-2, "readI64Be");
+    l.setField(-2, "read_i64be");
 
     // String and bool readers
     l.pushFunction(ziglua.wrap(bReadString));
-    l.setField(-2, "readString");
+    l.setField(-2, "read_string");
 
     l.pushFunction(ziglua.wrap(bReadBool));
-    l.setField(-2, "readBool");
+    l.setField(-2, "read_bool");
 
     l.pushValue(-1); // => [<o> <mt> <mt>]
     l.setField(-2, "__index"); // => [<o> <mt>]
@@ -360,18 +354,6 @@ fn bSeek(l: *Lua) i32 {
     }
 
     self.pos = num;
-    return 0;
-}
-
-fn bSeekStart(l: *Lua) i32 {
-    const self = checkBuffer(l, 1);
-    self.pos = 0;
-    return 0;
-}
-
-fn bSeekEnd(l: *Lua) i32 {
-    const self = checkBuffer(l, 1);
-    self.pos = self.val.items.len;
     return 0;
 }
 

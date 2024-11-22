@@ -17,6 +17,7 @@ htt.fs = {}
 htt.tpl = {}
 htt.is = {}
 htt.json = {}
+htt.test = {}
 
 -- STR Functions
 -- ------------------------------------------------------------
@@ -170,22 +171,6 @@ function htt.fs.path_join(...)
 	return table.concat(tbl, htt.fs.sep)
 end
 
-function htt.fs.dirname(path)
-	return string.match(path, "^(.*)/.*$") or "."
-end
-
-function htt.fs.basename(path)
-	local res = string.match(path, "^.*/(.*)$") or path
-	if res ~= "" then
-		return res
-	end
-	local nxt = string.sub(path, 1, -2)
-	if nxt == "" then
-		return ""
-	end
-	return htt.fs.basename(nxt)
-end
-
 function htt.fs.null_file()
 	if package.config:sub(1, 1) == '\\' then
 		return "NUL" -- Windows
@@ -237,6 +222,21 @@ function htt.is.fn(value)
 		return false, "Expected function, got " .. type(value)
 	end
 	return true, nil
+end
+
+function htt.is.callable(value)
+	if type(value) == "function" then
+		return true, nil
+	end
+	local mt = getmetatable(value)
+	if mt and mt.__call ~= nil then
+		return true, nil
+	end
+	local err = "Expected a callable, got " .. type(value)
+	if type(value) == "table" then
+		err = err .. " (no __call metamethod)"
+	end
+	return false, err
 end
 
 function htt.is.table(value)
@@ -529,7 +529,6 @@ function htt.tpl.install_loader()
 end
 
 -- @section Testing
-htt.test = {}
 htt.test.TestCtx = {}
 
 function htt.test.eql(a, b)

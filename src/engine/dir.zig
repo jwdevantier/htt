@@ -105,7 +105,7 @@ fn dir_list_start(l: *Lua) i32 {
 
     l.pushLightUserdata(iter);
 
-    // push closure with 2 upvalues.
+    // push closure with 3 upvalues.
     // 1: the TypeDir reference - this is to prevent it being garbage-collected
     //    (thus closed) before time
     // 2: the ftype "enum", cached to limit lookups
@@ -188,7 +188,9 @@ fn dir_walk_start_(l: *Lua) !i32 {
 }
 
 fn dir_walk_start(l: *Lua) i32 {
-    const ret = dir_walk_start_(l) catch {
+    const ret = dir_walk_start_(l) catch |err| {
+        l.pushNil();
+        _ = l.pushString(@errorName(err));
         return 0;
     };
     return ret;
@@ -336,10 +338,10 @@ fn dir_metatable(l: *Lua, ndx_dir_tbl: i32) void {
     l.setField(-2, "path");
 
     l.pushFunction(ziglua.wrap(dir_makepath));
-    l.setField(-2, "makePath");
+    l.setField(-2, "make_path");
 
     l.pushFunction(ziglua.wrap(dir_openDir));
-    l.setField(-2, "openDir");
+    l.setField(-2, "open_dir");
 
     l.pushFunction(ziglua.wrap(dir_openParent));
     l.setField(-2, "parent");

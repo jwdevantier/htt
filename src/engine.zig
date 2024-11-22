@@ -9,7 +9,6 @@
 const std = @import("std");
 const ziglua = @import("ziglua");
 
-const dir = @import("engine/dir.zig");
 const env = @import("engine/env.zig");
 const tpl = @import("engine/tpl.zig");
 const json = @import("engine/json.zig");
@@ -58,15 +57,7 @@ pub fn registerZigFuncs(lua: *Lua) !void {
 
     try time.registerFuncs(lua, htt_ndx);
 
-    _ = lua.getField(htt_ndx, "fs");
-    lua.pushFunction(ziglua.wrap(dir.fs_cwd));
-    lua.setField(-2, "cwd");
-
-    lua.pushFunction(ziglua.wrap(fs.fsSelect));
-    lua.setField(-2, "select");
-
-    _ = lua.pushString(std.fs.path.sep_str);
-    lua.setField(-2, "sep");
+    try fs.registerFuncs(lua, htt_ndx);
 
     _ = lua.getField(htt_ndx, "tpl");
     lua.pushFunction(ziglua.wrap(tpl.compile));

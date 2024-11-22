@@ -6,7 +6,9 @@ local MSG_LEN_BYTES = 4
 local CMD_BYTES = 2
 
 local server = nil
+--- @type htt.tcp.Stream
 local stream = nil
+--- @type htt.tcp.Buffer
 local buf = nil
 local rq_id = 0
 
@@ -15,7 +17,7 @@ local function ensure_server()
 
 	local err = nil
 
-	buf, err = htt.tcp.buffer(16384);
+	buf, err = htt.tcp.buffer(BUFSIZ);
 	if err ~= nil then
 		error(string.format("failed to allocate buffer: %s", err))
 	end
@@ -53,6 +55,10 @@ end
 local function highlight_code(code, language)
 	ensure_server()
 
+	if buf == nil or stream == nil then
+		error(string.format("invariant broken: buf and/or stream is nil"))
+	end
+
 	rq_id = rq_id + 1
 	if language == nil then
 		language = "htt"
@@ -60,10 +66,10 @@ local function highlight_code(code, language)
 
 	local msg = string.format("lang:%s;%s", language, code)
 	buf:seek(0)
-	local msg_len = CMD_BYTES + #msg  -- msg length is: msg_len + cmd + message
-	buf:writeU32Le(msg_len)
-	buf:writeU16Le(CMD_HIGHLIGHT)
-	buf:writeString(msg)
+	local msg_len = CMD_BYTES + #msg -- msg length is: msg_len + cmd + message
+	buf:write_u32le(msg_len)
+	buf:write_u16le(CMD_HIGHLIGHT)
+	buf:write_string(msg)
 	local rq_len = buf:tell()
 
 	buf:seek(0)
@@ -80,7 +86,7 @@ local function highlight_code(code, language)
 	end
 
 	buf:seek(0)
-	local rsp_len = buf:readU32Le()
+	local rsp_len = buf:read_u32le()
 	buf:seek(0)
 	_, err = stream:recv_at_least(buf, rsp_len)
 	if err ~= nil then
@@ -88,15 +94,15 @@ local function highlight_code(code, language)
 	end
 
 	buf:seek(0)
-	return buf:readString(rsp_len)
+	return buf:read_string(rsp_len)
 end
 
 local function cleanup()
-	if server ~= nil then
+	if server ~= nil and buf ~= nil and stream ~= nil then
 		print("Shutting Down Highlight Server")
 		buf:seek(0)
-		buf:writeU32Le(CMD_BYTES)
-		buf:writeU16Le(CMD_SHUTDOWN)
+		buf:write_u32le(CMD_BYTES)
+		buf:write_u16le(CMD_SHUTDOWN)
 		local rq_len = buf:tell()
 		buf:seek(0)
 		err = stream:send(buf, rq_len)

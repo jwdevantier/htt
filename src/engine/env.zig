@@ -39,7 +39,7 @@ pub fn registerFuncs(lua: *Lua, htt_tbl_ndx: i32) !void {
     _ = lua.getField(htt_tbl_ndx, "env");
 
     lua.pushFunction(ziglua.wrap(api_version));
-    lua.setField(-2, "apiversion");
+    lua.setField(-2, "api_version");
 
     lua.pushFunction(ziglua.wrap(htt_path));
     lua.setField(-2, "htt_path");

@@ -27,7 +27,7 @@ local renderPage = function(page, section)
 
 	-- slug is also the dirpath, so create it in the out dir
 	local out_dir = htt.fs.path("out" .. "/" .. string.sub(page.slug, #SITE_PREFIX + 1))
-	cwd:makePath(out_dir)
+	cwd:make_path(out_dir)
 	local out_file = htt.fs.path_join(out_dir, "index.html")
 
 	print("rendering " .. out_file)
@@ -80,3 +80,4 @@ require("highlight").cleanup()
 
 local time_end = htt.time.timestamp_ms()
 print(string.format("Documentation generated in %dms", time_end - time_start))
+
