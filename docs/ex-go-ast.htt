@@ -15,7 +15,7 @@ Lua tables are a hybrid data-structure which can work both as an list and a map.
 
 % @component main
 <p class="mb-2">
-This example implements some of the AST nodes from the book, {{T.a("https://interpreterbook.com/", "Writing an Interpreter in Go")}}, specifically as implemented in {{T.a("https://github.com/kitasuke/monkey-go/blob/e1716fdf2e445456116fc844023a685521202f91/ast/ast.go", "this git repository")}}.
+This example implements some of the AST nodes from the book, {{@ C.url { ref = "https://interpreterbook.com/", label = "Writing an Interpreter in Go"}}}, specifically as implemented in {{@ C.url { ref = "https://github.com/kitasuke/monkey-go/blob/e1716fdf2e445456116fc844023a685521202f91/ast/ast.go", label = "this git repository"}}}.
 ~></p>
 
 <p class="mb-2">

@@ -4,7 +4,7 @@ function M.test_dirname(t)
 	local tests = {
 		{ "/path/to/hello.lua",  "/path/to" },
 		{ "./path/to/hello.lua", "./path/to" },
-		{ "hello.lua",           "." },
+		{ "hello.lua",           "" },
 		{ "../path/to/../smth",  "../path/to/.." }
 	}
 	for _, data in ipairs(tests) do

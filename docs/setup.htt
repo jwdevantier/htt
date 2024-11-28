@@ -1,0 +1,60 @@
+% local C = require "//common.htt"
+% local T = require "tags"
+% local e = require "elems"
+% local url = C.url
+% local li = e.li
+% local ol = e.ol
+% local ul = e.ul
+
+
+% @component main
+{{T.h2 "Installing HTT"}}
+<p class="mb-4">
+HTT is available for all the major platforms:
+% @code
+local platform_list = ul {
+  li {"Linux (x86-64, Arm64)"},
+  li {"macOS (Apple Silicon)"},
+  li {"Windows (x86-64, Arm64)"},
+}
+% @end
+{{@ C.list platform_list }}
+~></p>
+
+<p class="mt-4 mb-4">
+Head to the {{@url { ref = "https://github.com/jwdevantier/htt/releases", label = "HTT releases"} }} page and pick the binary that matches your OS and architecture.
+~></p>
+
+{{T.h2 "Syntax Highlighting"}}
+<p class="mb-4">
+HTT uses a custom DSL (domain-specific language) for writing templates. Currently, there is syntax highlighting support for the following editors:
+% @code
+local editors = ul {
+  li {url, {ref = "https://github.com/jwdevantier/htt-nvim", label = "Neovim"}},
+  li {url, {ref = "https://github.com/jwdevantier/htt-vscode", label = "Visual Studio Code"}}
+}
+% @end
+{{@ C.list editors }}
+~></p>
+
+{{T.h3 "Visual Studio Code"}}
+<p class="mb-4">
+% @code
+local install_steps_ = ol {
+  li {"Open Visual Studio Code"},
+  li {"Open Extensions View:", ul {
+    li {"Linux/Windows: CTRL+SHIFT+X"},
+    li {"macOS: ⌘+SHIFT+X"}}
+  },
+  li {[[Search for "HTT Templating Language"]]},
+  li {"Install"},
+}
+% @end
+{{@ C.list install_steps_ }}
+~></p>
+
+{{T.h3 "Neovim"}}
+<p class="mb-4">
+The neovim plugin is hosted at the {{@ url {ref = "https://github.com/jwdevantier/htt-nvim", label = "htt-nvim"}}} repository. You may install it using your regular neovim plugin manager. The repository itself shows how an entry would look for users of {{@ url {ref = "https://github.com/folke/lazy.nvim", label = "lazy"}}}.
+~></p>
+% @end

@@ -8,7 +8,7 @@ render = (function()
 
 		local fpath = htt.fs.path_join(out_dir, out_fpath)
 		local parent = htt.fs.dirname(fpath)
-		local _, err = htt.fs.cwd():makePath(parent)
+		local _, err = htt.fs.cwd():make_path(parent)
 		if err ~= nil then
 			error(string.format("cannot create directory '%s'", parent))
 		end

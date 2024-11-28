@@ -1,6 +1,7 @@
 %local sitename = "HTT Documentation"
 %local conf = require("conf")
 
+
 % @component xref
 % local page = conf.ref2page[ctx.ref]
 % if page then
@@ -10,6 +11,48 @@
 <a href="#" class="text-red-600">{{ ctx.txt or ctx.ref or "invalid link"}}</a>
 % end
 % @end
+
+
+% @component url
+% @code
+if ctx.ref == nil then
+    error("ctx.ref is nil - it must be set")
+end
+if ctx.label == nil then
+    error("ctx.label is nil, it must be set")
+end
+% @end
+<a href="{{ctx.ref}}" target="_blank" class="text-blue-600">{{ctx.label}}</a>
+% @end
+
+
+% @component list
+% @code
+local lst = ctx
+local indent = ctx._indent or 0
+local class = htt.str.join(' ', lst.attrs.class)
+% @end
+<{{lst.tag}} class="{{class}}
+% if indent ~= 0 then
+~> ml-{{indent}}
+% end
+">
+% for _, item in ipairs(lst.children) do
+<li>
+% if item.fn ~= nil then
+~>{{@ item.fn item.ctx}}
+% else
+~>{{ item.val }}
+% end
+% if item.child ~= nil then
+% item.child._indent = indent + 4
+~> {{@ M.list item.child }}
+% end
+~></li>
+% end -- /for
+</{{lst.tag}}>
+% @end
+
 
 % @component codebox
 % @code
@@ -37,9 +80,11 @@ style = style .. [[p-4 rounded-md"]]
 </div>
 % @end
 
+
 % @component text
 {{ ctx.text }}
 % @end
+
 
 % @component run_htt
 % @code
@@ -71,6 +116,7 @@ os.remove(tmp_output)
 {{@ codebox {c = text, c_args = {text = output} } }}
 % @end
 
+
 % -- include contents of a file as a text/code box
 % @component include
 % @code
@@ -92,6 +138,7 @@ end
 % @end
 % @end
 
+
 % -- produce a code box listing the contents of a particular component
 % @component compSrc
 % @code
@@ -110,6 +157,7 @@ content = require('highlight').highlight_code(content, "htt")
 {{@ codebox {c = text, c_args = {text = content}, highlight = true } }}
 % @end
 
+
 % -- evaluate component with args, show output as text/code box
 % @component eval
 % local m = require(ctx.file)
@@ -117,9 +165,11 @@ content = require('highlight').highlight_code(content, "htt")
 {{@ codebox {c = m[component_name], c_args = ctx.ctx or {} } }}
 % @end
 
+
 % @component textbox
 {{@ codebox {c = text, c_args = {text = ctx.text} } }}
 % @end
+
 
 % @component bNote
 <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
@@ -135,6 +185,7 @@ content = require('highlight').highlight_code(content, "htt")
 </div>
 % @end
 
+
 % @component note
 % @code
 local args = {
@@ -148,6 +199,7 @@ local args = {
 {{@ bNote args }}
 % @end
 
+
 % @component warn
 % @code
 local args = {
@@ -160,6 +212,7 @@ local args = {
 % @end
 {{@ bNote args }}
 % @end
+
 
 % @component menuSection
 % local section = ctx.section
@@ -184,6 +237,7 @@ local args = {
 </li>
 % @end
 
+
 % @component menu
 % for _, entry in pairs(conf.site) do
     % if conf.is_section(entry) then
@@ -195,6 +249,7 @@ local args = {
     % end -- if
 % end -- for
 % @end
+
 
 % @component base
 % local section = conf.ref2section[ctx.page.refid]
@@ -263,13 +318,13 @@ local args = {
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
     let lines = codeBlock.innerHTML.split('\n');
-    
+
     // Find the minimum non-zero indentation, ignoring the first line
     const minIndent = lines.slice(1).reduce((min, line) => {
       const indent = line.match(/^\s*/)[0].length;
       return (line.trim().length && indent < min) ? indent : min;
     }, Infinity);
-    
+
     // Process lines: keep first line as is, remove minIndent from others
     const processedLines = [
       lines[0],
@@ -278,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return line.slice(Math.min(currentIndent, minIndent));
       })
     ];
-    
+
     codeBlock.innerHTML = processedLines.join('\n');
   });
 });

@@ -22,14 +22,14 @@ local function reset_output_dir()
 	--
 	-- We do this to avoid lingering files from earlier runs.
 	local dirname = htt.fs.basename(config.output_dir)
-	local parent, err = htt.fs.cwd():openDir(htt.fs.dirname(config.output_dir))
+	local parent, err = htt.fs.cwd():open_dir(htt.fs.dirname(config.output_dir))
 	if err ~= nil then
 		return "failed to open parent directory (?!)"
 	end
 
 	local out_kind = parent:exists(dirname)
 	if out_kind == "DIRECTORY" then
-		local d, err = parent:openDir(dirname)
+		local d, err = parent:open_dir(dirname)
 		if err ~= nil then
 			return "failed to open config dir, but it exists"
 		end
@@ -51,15 +51,15 @@ local function reset_output_dir()
 			return "failed to remove old output directory"
 		end
 	elseif out_kind ~= nil then
-		return strint.format("object at '%s' identified as '%s', expected 'DIRECTORY'", config.output_dir, out_kind)
+		return string.format("object at '%s' identified as '%s', expected 'DIRECTORY'", config.output_dir, out_kind)
 	end
 
-	_, err = parent:makePath(dirname)
+	_, err = parent:make_path(dirname)
 	if err ~= nil then
 		return "failed to re-create output directory"
 	end
 
-	d, err = parent:openDir(dirname)
+	d, err = parent:open_dir(dirname)
 	if err ~= nil then
 		return "failed to open newly re-created output directory"
 	end
@@ -72,7 +72,7 @@ end
 
 local function cleanup_temp_dir()
 	if config.using_temp_dir and config.output_dir then
-		local parent, err = htt.fs.cwd():openDir(htt.fs.dirname(config.output_dir))
+		local parent, err = htt.fs.cwd():open_dir(htt.fs.dirname(config.output_dir))
 		if err ~= nil then
 			error("could not open parent of tmp dir")
 		end
@@ -142,7 +142,7 @@ local function ensure_test_output_dir()
 end
 
 local function collect_tests()
-	local tdir, err = htt.fs.cwd():openDir(TESTS_INPUTS_PATH)
+	local tdir, err = htt.fs.cwd():open_dir(TESTS_INPUTS_PATH)
 
 	if err ~= nil then
 		error(string.format("cannot open HTT tests directory '%s': %s", tinput_root, err))

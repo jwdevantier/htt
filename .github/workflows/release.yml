@@ -23,9 +23,6 @@ jobs:
         with:
           version: 0.13.0
 
-      - name: Build HTT
-        run: zig build
-
       - name: Create release directory
         run: mkdir -p releases
 

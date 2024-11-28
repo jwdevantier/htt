@@ -3,6 +3,7 @@ const ziglua = @import("ziglua");
 const Allocator = std.mem.Allocator;
 const Lua = ziglua.Lua;
 
+const dir = @import("dir.zig");
 const file = @import("file.zig");
 const File = file.File;
 const F_ID = file.F_ID;
@@ -203,4 +204,37 @@ pub fn fsSelect(l: *Lua) i32 {
 
     l.pushNil(); // no error
     return 2;
+}
+
+fn dirname(l: *Lua) i32 {
+    const str = l.checkString(1);
+    _ = l.pushString(std.fs.path.dirname(str) orelse "");
+    return 1;
+}
+
+fn basename(l: *Lua) i32 {
+    const str = l.checkString(1);
+    _ = l.pushString(std.fs.path.basename(str));
+    return 1;
+}
+
+pub fn registerFuncs(lua: *Lua, htt_tbl_ndx: i32) !void {
+    const top = lua.getTop();
+    _ = lua.getField(htt_tbl_ndx, "fs");
+
+    lua.pushFunction(ziglua.wrap(dir.fs_cwd));
+    lua.setField(-2, "cwd");
+
+    lua.pushFunction(ziglua.wrap(fsSelect));
+    lua.setField(-2, "select");
+
+    _ = lua.pushString(std.fs.path.sep_str);
+    lua.setField(-2, "sep");
+
+    lua.pushFunction(ziglua.wrap(dirname));
+    lua.setField(-2, "dirname");
+
+    lua.pushFunction(ziglua.wrap(basename));
+    lua.setField(-2, "basename");
+    lua.setTop(top);
 }

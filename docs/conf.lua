@@ -104,6 +104,10 @@ M.site = {
 		slug = ""
 	},
 	Page {
+		title = "Setup",
+		refid = "setup",
+	},
+	Page {
 		title = "Quick Start",
 		refid = "quick-start",
 	},
@@ -153,4 +157,3 @@ M.Page = Page
 M.Section = Section
 
 return M
-

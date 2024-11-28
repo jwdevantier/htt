@@ -1,0 +1,126 @@
+% -- see typestub.htt.lua for helper functions
+
+% @component Description
+% if type(ctx.val) == "string" then
+---{{ctx.val}}
+% elseif type(ctx.val) == "table" then
+% for _, line in ipairs(ctx.val) do
+---{{line}}
+% end
+% end
+% @end
+
+
+% @component Alias
+{{@ M.Description {val = ctx.alias.desc or ctx.alias.summary} }}
+---@alias {{ctx.alias.name}} {{ctx.alias.def}}
+% @end
+
+
+% @component FnArgs
+% if #ctx > 0 then
+{{ctx[1].name}}
+% for i = 2, #ctx do
+~>, {{ctx[i].name}}
+% end
+% end
+% @end
+
+
+% @component Function
+{{@ M.Description {val = ctx.fn.desc or ctx.fn.summary} }}
+% for _, param in ipairs(ctx.fn.params) do
+---@param {{param.name}} {{param.type}} {{param.summary}}
+% end
+% for _, ret in ipairs(ctx.fn.returns) do
+% if ret.name ~= nil then
+---@return {{ret.type}} {{ret.name}} {{capitalize(ret.summary)}}
+% else
+---@return {{ret.type}} {{capitalize(ret.summary)}}
+% end
+% end
+function {{htt.str.join('.', ctx.parent)}}{{ctx.sep or '.'}}{{ctx.fn.name}}({{@ M.FnArgs ctx.fn.params }}) end
+% @end
+
+
+% @component Type
+% local parent = concat(ctx.parent, ctx.type.name)
+---@class {{htt.str.join('.', ctx.parent)}}.{{ctx.type.name}}
+% for _, field in ipairs(ctx.type.fields or {}) do
+---@field {{field.name}} {{field.type}} {{field.summary}}
+% end
+% for _, op in ipairs(ctx.type.operators or {}) do
+---@operator {{op.definition}}: {{op.returns}}
+% end
+% if ctx.type.define ~= false then
+{{htt.str.join('.', ctx.parent)}}.{{ctx.type.name}} = {}
+% end
+% for _, item in ipairs(ctx.type.content or {}) do
+% if item.type == "function" then
+
+{{@ M.Function {fn = item, parent = parent, sep = ":"} }}
+% end -- if
+% end -- for
+% @end
+
+
+% @component Constant
+% if ctx.val.desc then
+{{@ Description {val = ctx.val.desc} }}
+% end
+---@type {{ctx.val.luatype}}
+{{htt.str.join('.', ctx.parent)}}.{{ctx.val.name}} = nil
+% @end
+
+
+% @component ModuleContent
+
+% for _, item in ipairs(ctx.mod.content) do
+% if item.type == "module" then
+
+{{@ M.Module { mod = item, parent = ctx.parent } }}
+% elseif item.type == "alias" then
+
+{{@ M.Alias {alias = item, parent = ctx.parent} }}
+% elseif item.type == "function" then
+
+{{@ M.Function {fn = item, parent = ctx.parent} }}
+% elseif item.type == "type" then
+
+{{@ M.Type {type = item, parent = ctx.parent} }}
+% elseif item.type == "constant" then
+
+{{@ M.Constant {val = item, parent = ctx.parent} }}
+% end -- if
+% end -- for
+% @end
+
+
+% @component Module
+% local parent = concat(ctx.parent, ctx.mod.name)
+% local mod_name = pascalCase("htt", ctx.mod.name, "module")
+% if ctx.mod.desc then
+{{@ Description {val = ctx.mod.desc} }}
+% end
+---@class {{mod_name}}
+{{htt.str.join('.', ctx.parent)}}.{{ctx.mod.name}} = {}
+{{@ ModuleContent { mod = ctx.mod, parent = parent } }}
+% @end
+
+
+% @component TopLevel
+---@meta
+
+---{{ctx.mod.summary}}
+---@class {{ctx.mod.class}}
+% for _, submod in ipairs(ctx.mod.modules) do
+---@field {{submod.name}} {{pascalCase(ctx.mod.class, submod.name, "module")}} {{submod.summary}}
+% end
+{{ctx.mod.class}} = {}
+{{@ ModuleContent {mod = ctx.mod, parent = {"htt"} } }}
+% for _, submod in ipairs(ctx.mod.modules) do
+
+{{@ Module { mod = submod, parent = {"htt"} } }}
+% end
+% @end
+
