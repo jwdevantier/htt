@@ -92,6 +92,18 @@ M.is_section = function(instance)
 end
 
 
+local compute_slug = function(site_prefix, page, section)
+	-- compute slugs
+	local slug
+	if section ~= nil then
+		slug = section.slug .. "/" .. page.slug
+	else
+		slug = page.slug
+	end
+	page.slug = site_prefix .. slug
+end
+
+
 -- TODO: enforce that all refids are unique
 --       and build up a link map
 
@@ -135,20 +147,27 @@ M.site = {
 	}
 }
 
+-- TODO: could import code for preprocessing API here
+
 -- page.refid -> page instance
 M.ref2page = {}
 -- page.refid -> parent section (if any)
 M.ref2section = {}
 
-for _, entry in ipairs(M.site) do
-	if M.is_section(entry) then
-		local section = entry
-		for _, entry in ipairs(section.pages) do
+M.site_post_process = function(site_prefix)
+	-- NOTE: run *after* adding all pages and sections to site variable
+	for _, entry in ipairs(M.site) do
+		if M.is_section(entry) then
+			local section = entry
+			for _, page in ipairs(section.pages) do
+				M.ref2page[page.refid] = entry
+				M.ref2section[page.refid] = section
+				compute_slug(site_prefix, page, section)
+			end
+		elseif M.is_page(entry) then
 			M.ref2page[entry.refid] = entry
-			M.ref2section[entry.refid] = section
+			compute_slug(site_prefix, entry, nil)
 		end
-	elseif M.is_page(entry) then
-		M.ref2page[entry.refid] = entry
 	end
 end
 

@@ -6,9 +6,8 @@
 
 % @component importNoteContent
 <p>Notice the call to {{code "require"}}. HTT templates are transparently
-compiled to Lua as they are first imported.
+compiled to Lua as they are first imported. Read more about importing HTT templates {{@ C.xref {ref = "modules-and-files", bookmark = "import-htt", txt = "here"}}}
 ~></p>
-<p>{{T.todo "link to reference on importing"}}</p>
 % @end
 
 % @component directiveNote
@@ -47,7 +46,6 @@ HTT interprets lines where text after {{code "%"}} starts with {{code "@"}} diff
 ~></p>
 
 {{@ C.include {file = "examples/quick-start/test-htt.lua"} }}
-
 
 
 {{@ C.note {c = importNoteContent} }}

@@ -218,6 +218,42 @@ fn basename(l: *Lua) i32 {
     return 1;
 }
 
+fn path_join(l: *Lua) i32 {
+    const a = l.allocator();
+    var start: usize = 0;
+
+    // get number of arguments
+    const nargs: usize = @intCast(l.getTop());
+    if (nargs == 0) return 0;
+
+    // create array to hold path segments
+    var paths = a.alloc([]const u8, nargs) catch {
+        l.pushNil();
+        _ = l.pushString("out of memory");
+        return 2;
+    };
+    defer a.free(paths);
+
+    // collect path segments
+    for (0..nargs) |i| {
+        paths[i] = l.checkString(@intCast(i + 1));
+        if (std.fs.path.isAbsolute(paths[i])) {
+            start = i;
+        }
+    }
+
+    const joined = std.fs.path.join(a, paths[start..]) catch {
+        l.pushNil();
+        _ = l.pushString("failed to join paths");
+        return 2;
+    };
+
+    defer a.free(joined);
+
+    _ = l.pushString(joined);
+    return 1;
+}
+
 pub fn registerFuncs(lua: *Lua, htt_tbl_ndx: i32) !void {
     const top = lua.getTop();
     _ = lua.getField(htt_tbl_ndx, "fs");
@@ -236,5 +272,9 @@ pub fn registerFuncs(lua: *Lua, htt_tbl_ndx: i32) !void {
 
     lua.pushFunction(ziglua.wrap(basename));
     lua.setField(-2, "basename");
+
+    lua.pushFunction(ziglua.wrap(path_join));
+    lua.setField(-2, "path_join");
+
     lua.setTop(top);
 }

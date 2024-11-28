@@ -8,3 +8,5 @@ PLAN.md
 *.out.lua
 *.tmp
 node_modules
+.luals
+.luarc.json

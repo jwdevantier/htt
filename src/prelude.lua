@@ -161,16 +161,6 @@ function htt.fs.path(s)
 	return string.gsub(s, "/", htt.fs.sep)
 end
 
-function htt.fs.path_join(...)
-	local tbl = {}
-	for _, v in ipairs({ ... }) do
-		if v ~= "." then
-			table.insert(tbl, v)
-		end
-	end
-	return table.concat(tbl, htt.fs.sep)
-end
-
 function htt.fs.null_file()
 	if package.config:sub(1, 1) == '\\' then
 		return "NUL" -- Windows

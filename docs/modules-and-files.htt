@@ -106,6 +106,7 @@ If {{code "package.path"}} is {{code "/tmp/?.lua;/tmp/?/init.lua;"}} and we {{co
     <li>Raise an error - could not find the module</li>
 </ul>
 
+{{T.bookmark "import-htt"}}
 {{T.h3 "Importing HTT Templates"}}
 <p class="mb-2">
 HTT extends Lua's regular {{code "require"}} function to also work for importing HTT templates. When requiring templates, three things are different from importing regular Lua modules:

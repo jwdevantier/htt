@@ -59,6 +59,8 @@ function {{htt.str.join('.', ctx.parent)}}{{ctx.sep or '.'}}{{ctx.fn.name}}({{@ 
 % if item.type == "function" then
 
 {{@ M.Function {fn = item, parent = parent, sep = ":"} }}
+% else
+% error(string.format("expects .content elems of type to be 'function', got '%s'", item.type))
 % end -- if
 % end -- for
 % @end
@@ -113,14 +115,17 @@ function {{htt.str.join('.', ctx.parent)}}{{ctx.sep or '.'}}{{ctx.fn.name}}({{@ 
 
 ---{{ctx.mod.summary}}
 ---@class {{ctx.mod.class}}
-% for _, submod in ipairs(ctx.mod.modules) do
----@field {{submod.name}} {{pascalCase(ctx.mod.class, submod.name, "module")}} {{submod.summary}}
+% for _, item in ipairs(ctx.mod.content) do
+% if item.type == "module" then
+---@field {{item.name}} {{pascalCase(ctx.mod.class, item.name, "module")}} {{item.summary}}
+% end
 % end
 {{ctx.mod.class}} = {}
-{{@ ModuleContent {mod = ctx.mod, parent = {"htt"} } }}
-% for _, submod in ipairs(ctx.mod.modules) do
+% for _, item in ipairs(ctx.mod.content) do
+% if item.type == "module" then
 
-{{@ Module { mod = submod, parent = {"htt"} } }}
+{{@ Module { mod = item, parent = {"htt"} } }}
+% end
 % end
 % @end
 

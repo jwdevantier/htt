@@ -1,9 +1,14 @@
 %local sitename = "HTT Documentation"
-%local conf = require("conf")
+%local model = require("model")
 
+% @component code
+<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">
+~>{{ctx.text}}
+~></code>
+% @end
 
 % @component xref
-% local page = conf.ref2page[ctx.ref]
+% local page = model.ref2page[ctx.ref]
 % if page then
 % local url = page.slug .. (ctx.bookmark and ("#" .. ctx.bookmark) or "")
 <a href="{{ url }}" class="text-blue-600">{{ ctx.txt or page.title}}</a>
@@ -239,10 +244,10 @@ local args = {
 
 
 % @component menu
-% for _, entry in pairs(conf.site) do
-    % if conf.is_section(entry) then
+% for _, entry in pairs(model.site) do
+    % if model.is_section(entry) then
 {{@ menuSection { section = entry, page = ctx.page } }}
-    % elseif conf.is_page(entry) then
+    % elseif model.is_page(entry) then
     % local x = entry.refid == ctx.page.refid and " font-bold" or ""
     % print("entry(" .. entry.refid .. "), ctx.page(".. ctx.page.refid .. ") ->" .. tostring(x))
 <li class="hover:bg-gray-200"><a href="{{ entry.slug }}" class="pl-2 text-blue-600 block w-full h-full py-2{{x}}">{{ entry.title }}</a></li>
@@ -252,7 +257,7 @@ local args = {
 
 
 % @component base
-% local section = conf.ref2section[ctx.page.refid]
+% local section = model.ref2section[ctx.page.refid]
 <!DOCTYPE html>
 <html lang="en">
 <head>
