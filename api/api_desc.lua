@@ -1,25 +1,5 @@
 local M = {}
 
--- TODO: add to htt, we will need it for all descriptions
-local function dedent(str)
-	-- Add newline at start to simplify pattern matching
-	str = "\n" .. str
-	local level = math.huge
-	for indent in str:gmatch("\n(%s*)%S") do
-		level = math.min(level, #indent)
-	end
-	-- Remove the extra newline and indentation
-	return str:gsub("\n" .. string.rep(" ", level), "\n"):sub(2)
-end
-
-local function lstrip(str)
-	return str:gsub("^%s+", "")
-end
-
-local function rstrip(str)
-	return str:gsub("[\n\r%s]+$", "")
-end
-
 
 M.htt = {
 	content = {}
@@ -110,7 +90,7 @@ m_str.content = {
 			"Returns whether the string begins with the specified prefix",
 		},
 		returns = {
-			{ type = "boolean", summary = "# true if str starts with prefix, false otherwise" }
+			{ type = "boolean", summary = "true if str starts with prefix, false otherwise" }
 		},
 	},
 }
@@ -427,6 +407,9 @@ m_tcp.content = {
 	{
 		name = "Endpoint",
 		type = "alias",
+		desc = {
+			"Value representing an IP address and port"
+		},
 		def = "userdata", -- a Zig-type, opaque to Lua
 	},
 	tcp_stream,
@@ -478,8 +461,8 @@ m_tcp.content = {
 			"Connect to a TCP server at the IP-address and port specified by `endpoint`"
 		},
 		returns = {
-			{ name = "stream", type = "htt.tcp.Stream", summary = "stream with which to communicate with the server." },
-			{ name = "error",  type = "string",         summary = "error message, if any occurred." },
+			{ name = "stream", type = t_tcp_stream, summary = "stream with which to communicate with the server." },
+			{ name = "error",  type = "string",     summary = "error message, if any occurred." },
 		}
 	}
 }
@@ -495,6 +478,9 @@ m_time.content = {
 		name = "nanosecond",
 		type = "alias",
 		def = "integer",
+		desc = {
+			"a value meaning some number of nanoseconds"
+		},
 	},
 	{
 		name = "timestamp",
@@ -587,9 +573,19 @@ m_fs.content = {
 
 	},
 	{
-		name = "htt.fs.DirIterator",
+		name = "DirIterator",
 		type = "alias",
-		def = "fun(): path, htt.fs.ftype"
+		def = "fun(): path, htt.fs.ftype",
+		desc = {
+			"An iterator function returning pairs of path and 'file' type",
+			"",
+			"An iterator function which, when called, returns a pair of values",
+			"until such time as there are no more values.",
+			"",
+			"The path value is the file-system path to the entry (file or directory)",
+			"and the ftype value is an enumeration type describing the actual type of",
+			"the entry, notably whether a file or directory."
+		},
 	},
 	{
 		name = "path",
@@ -841,7 +837,7 @@ local m_is = {
 	desc = {
 		"Validate data through composable predicate functions describing the shape of data.",
 		"",
-		"With is, you get declaratively describe, through composable validation functions, the valid shape(s)",
+		"You get to declaratively describe, through composable validation functions, the valid shape(s)",
 		"of data, useful for constraining the data input (the model) to your templates."
 	}
 }
@@ -850,12 +846,22 @@ m_is.content = {
 	{
 		type = "alias",
 		name = _validator_fn_type,
-		def = "fun (value: any): boolean, string?"
+		def = "fun (value: any): boolean, string?",
+		desc = {
+			"Function used to determine if value conforms to some specification",
+			"",
+			"A validator function returns a pair of values, a boolean which is",
+			"true iff the value conforms to the specification and (optionally)",
+			"a string message, describing the issue if the value does not conform.",
+		},
 	},
 	{
 		type = "alias",
 		name = "PredicateFn",
 		def = "fun (value: any) boolean",
+		desc = {
+			"Function which, given a value returns true if test succeeds, false otherwise."
+		},
 	},
 	{
 		name = "null",
@@ -1096,8 +1102,18 @@ local m_json = {
 	}
 }
 
+htt.name = "htt"
 htt.summary = "HTT utility API"
 htt.class = "htt"
-htt.modules = { m_str, m_env, m_tcp, m_time, m_fs, m_tpl, m_is, m_json }
+htt.content = {
+	m_str,
+	m_env,
+	m_tcp,
+	m_time,
+	m_fs,
+	-- m_tpl,
+	m_is,
+	m_json,
+}
 
 return M

@@ -1,0 +1,287 @@
+% @code
+local T = require "tags"
+% @end
+
+% -- function 
+% -- {
+% --   name = "<str>",
+% --   type = "function",
+% --   params = { {name:str, type:str, summary: str}... }
+% --   desc = { line:str... },
+% --   returns = { {type:str, summary:str, name: str? }}
+% -- }
+
+% -- type
+% -- NOTE: define? is for LuaCATS, whether to define the val or not
+% -- NOTE: operators is also for LuaCATS, see @operator
+
+% -- {
+% --   name: str,
+% --   type = "type",
+% --   fields = { {name:str, type:str, summary: str} ...}?,
+% --   define: bool?,
+% --   operators = { {definition:str, returns: str}}?
+% --   content = {
+% --     <function>...
+% --   }?
+% -- }
+
+% -- alias
+% -- {
+% --   name = "xx",
+% --   type = "alias",
+% --   def = "<some str>"
+% --   desc: str ?,
+% --   summary: str?,
+% -- }
+
+% -- constant
+% -- {
+% --   name: str,
+% --   desc: str,
+% --   luatype: str
+% -- }
+
+% local EntryHeaderStyle = "font-mono font-bold text-gray-700"
+% -- used to assign a unique ID to each API definition element that can
+% -- be shown/hidden.
+% local open_api_defs = 0
+
+
+% -- written as a NO-OP in case description is nil
+% @component Description
+% if type(ctx.val) == "string" then
+<p class="mb-2">
+{{ctx.val}}</p>
+% elseif type(ctx.val) == "table" then
+<p class="mb-2">
+  % for _, line in ipairs(ctx.val) do
+    % if line == "" then
+~></p>
+<p class="mb-2">
+    % else
+{{line}}
+    % end
+  % end
+  </p>
+% end
+% @end
+
+
+% @component EntrySubHdr
+<div>
+<span class="text-sm text-gray-600 mb-1">{{ctx.text}}</span>
+</div>
+% @end
+
+
+% @component Tag
+<span class="bg-{{ctx.color}}-100 text-{{ctx.color}}-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ctx.text}}</span>
+% @end
+
+% @component Alias
+{{@ Description {val = ctx.item.desc}}}
+{{@ EntrySubHdr {text="Definition"}}}
+<span class="{{EntryHeaderStyle}}">{{ctx.item.def}}</span>
+% @end
+
+
+% @component AliasPreview
+<span class="{{EntryHeaderStyle}}">{{ctx.item.name}}</span>
+% @end
+
+
+% @component ParamType
+{{ctx.param.type}}
+% @end
+
+
+% @component FunctionSignature
+% local param_renderer = ctx.param_renderer
+{{ctx.fn.name}}(
+% if #ctx.fn.params > 0 then
+~>{{@ param_renderer {param = ctx.fn.params[1]}}}
+  % for i = 2, #ctx.fn.params do
+~>, {{@ param_renderer {param = ctx.fn.params[i]}}}
+  % end
+% end
+~>) &rarr; 
+% if #ctx.fn.returns > 0 then
+~>{{@ param_renderer {param = ctx.fn.returns[1]}}}
+  % for i = 2, #ctx.fn.returns do
+~>, {{@ param_renderer {param = ctx.fn.returns[i]}}}
+  % end
+% else
+~>nil
+% end
+% @end
+
+
+% @component Function
+{{@ Description {val = ctx.item.desc}}}
+% if #ctx.item.params > 0 then
+{{@ EntrySubHdr {text="Parameters"}}}
+<ul class="list-disc list-inside">
+  % for _, param in ipairs(ctx.item.params) do
+<li><span class="{{EntryHeaderStyle}}">{{param.name}}: {{param.type}}</span>
+    % if param.summary ~= nil then
+  <ul class="list-inside ml-4"><li>{{param.summary}}</li></ul>
+    % end
+~></li>
+  % end
+</ul>
+% end
+{{@ EntrySubHdr {text="Returns"}}}
+% if #ctx.item.returns > 0 then
+<ul class="list-disc list-inside">
+  % for _, ret in ipairs(ctx.item.returns) do
+<li><span class="{{EntryHeaderStyle}}">
+    % if ret.name ~= nil then
+~>{{ret.name}}: 
+    % end
+~>{{ret.type}}</span>
+    % if ret.summary ~= nil then
+  <ul class="list-inside ml-4"><li>{{ret.summary}}</li></ul>
+    % end
+~></li>
+  % end
+</ul>
+% else
+<span>No return value</span>
+% end
+% @end
+
+
+% @component FunctionPreview
+<code class="{{EntryHeaderStyle}} hover:text-blue-600">
+~>{{@ FunctionSignature {lookup = ctx.lookup, fn = ctx.item, param_renderer = ParamType}}}</code>
+% @end
+
+
+% @component Constant
+{{@ Description {val = ctx.item.desc}}}
+
+{{@ EntrySubHdr {text="Type"}}}
+<span class="{{EntryHeaderStyle}}">{{ctx.item.luatype}}</span>
+% @end
+
+
+% @component ConstantPreview
+<span class="{{EntryHeaderStyle}}">{{ctx.item.name}}</span>
+% @end
+
+
+% @component Type
+% if ctx.item.fields ~= nil and #ctx.item.fields > 0 then
+{{@ EntrySubHdr {text="Fields"}}}
+<ul class="list-disc list-inside">
+  % for _, field in ipairs(ctx.item.fields) do
+<li><span class="{{EntryHeaderStyle}}">{{field.name}}: {{field.type}}</span>
+    % if field.summary ~= nil then
+  <ul class="list-inside ml-4"><li>{{field.summary}}</li></ul>
+    % end
+~></li>
+  % end
+% end -- /fields
+% -- TODO: just rename content to methods already.
+% if ctx.item.content ~= nil and #ctx.item.content > 0 then
+{{@ EntrySubHdr {text="Methods"}}}
+<div class="ml-2">
+  % for _, item in ipairs(ctx.item.content) do
+<ul>
+{{@ M.Element {lookup = ctx.lookup, item = item} }}
+</ul>
+  % end
+</div>
+% end -- / method
+% @end
+
+
+% @component TypePreview
+<span class="{{EntryHeaderStyle}}">{{ctx.item.name}}</span>
+% @end
+
+
+% @component Element
+% @code
+local component
+local preview = nil
+local tag_color = "green"
+local tag_text = "stuff"
+if ctx.item.type == "function" then
+  component = Function
+  preview = FunctionPreview
+  tag_color = "blue"
+  tag_text = "Fn"
+elseif ctx.item.type == "alias" then
+  component = Alias
+  preview = AliasPreview
+  tag_color = "red"
+  tag_text = "A"
+elseif ctx.item.type == "type" then
+  component = Type
+  preview = TypePreview
+  tag_color = "green"
+  tag_text = "T"
+elseif ctx.item.type == "constant" then
+  component = Constant
+  preview = ConstantPreview
+  tag_color = "yellow"
+  tag_text = "C"
+else
+  error(string.format("API, Element: cannot render elements of type '%s'", ctx.item.type))
+end
+% @end
+% -- assign unique ID for show/hide functionality
+% local ndx = open_api_defs
+% open_api_defs = open_api_defs + 1
+<li>
+% if preview ~= nil then
+  <div @click="openApiDefs[{{ndx}}] = !openApiDefs[{{ndx}}]" class="flex justify-left items-center cursor-pointer py-2">
+    <svg x-show="!openApiDefs[{{ndx}}]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+    </svg>
+    <svg x-show="openApiDefs[{{ndx}}]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+    </svg>
+    <span>{{@ Tag {color=tag_color, text=tag_text} }}{{@ preview ctx}}</span>
+  </div>
+  <div x-show="openApiDefs[{{ndx}}]" class="pl-2 mb-4">
+  {{@ component ctx }}
+  </div>
+% else -- no preview, -> in-line
+<div>
+{{@ component ctx}}
+~></div>
+% end
+</li>
+% @end
+
+
+% @component main
+% -- ctx.module --- module
+% -- ctx.lookup(str)
+% if ctx.module.desc then
+{{@ Description {val = ctx.module.desc} }}
+% end
+<ul x-data="initApiModuleState()">
+% for _, item in ipairs(ctx.module.content) do
+{{@ Element {lookup = ctx.lookup, item = item} }}
+% end
+</ul>
+<script>
+function initApiModuleState() {
+  return {
+    openApiDefs: [
+~>
+% if open_api_defs > 0 then
+~>false
+  % for i=2, open_api_defs do
+~>, false
+  % end
+% end
+~>],
+  }
+}
+</script>
+% @end

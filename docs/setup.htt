@@ -57,4 +57,13 @@ local install_steps_ = ol {
 <p class="mb-4">
 The neovim plugin is hosted at the {{@ url {ref = "https://github.com/jwdevantier/htt-nvim", label = "htt-nvim"}}} repository. You may install it using your regular neovim plugin manager. The repository itself shows how an entry would look for users of {{@ url {ref = "https://github.com/folke/lazy.nvim", label = "lazy"}}}.
 ~></p>
+
+{{T.h2 "Type-checking and completions"}}
+<p class="mb-4">
+HTT can configure {{@ url {ref = "https://github.com/LuaLS/lua-language-server", label = "Lua Language Server"}}}, the most popular Lua LSP, such that it knows the HTT API.
+</p>
+
+<p class="mb-4">
+Run {{T.code "htt --init-lsp-conf"}} in the root directory of your project to generate the necessary (type-stub) files and configure the LSP. If you wish to write the files elsewhere, the {{T.code "-o"}}/{{T.code "--out-dir"}} flag can be used.
+</p>
 % @end

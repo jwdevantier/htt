@@ -23,6 +23,19 @@ jobs:
         run: ./zig-out/bin/htt tests/tpl/run_tests.lua
       - name: Run API unit tests
         run: ./zig-out/bin/htt tests/unit/run_tests.lua
+      - name: Ensure generated assets are up-to-date
+        run: ./zig-out/bin/htt build.lua
+      - name: Check for modified files
+        run: |
+          if ! git diff --quiet; then
+            echo "Error: Generated files are not up to date. Please regenerate files locally and commit changes."
+            echo ""
+            echo "The generated assets are versioned to ensure HTT can be built without having a built copy of HTT"
+            echo "which is recent enough (but not too recent) for the version of HTT you are attempting to build."
+            echo ""
+            git diff
+            exit 1
+          fi
 
   test-windows:
     needs: test-linux

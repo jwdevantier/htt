@@ -146,6 +146,41 @@ fn run(script_fpath: []const u8, out_dir: ?[]const u8) !void {
     };
 }
 
+fn write_typestubs(out_dir: ?[]const u8) !void {
+    std.debug.print("writing typestubs\n", .{});
+    if (out_dir) |o| {
+        var htt_root_hndl = try std.fs.cwd().openDir(o, .{});
+        defer htt_root_hndl.close();
+        try htt_root_hndl.setAsCwd();
+    }
+
+    try std.fs.cwd().makePath(".luals");
+
+    const typestub = try std.fs.cwd().createFile(
+        ".luals/htt.lua",
+        .{ .read = true, .truncate = true },
+    );
+    defer typestub.close();
+
+    // Write the content
+    try typestub.writeAll(@embedFile("./htt_typestubs.lua"));
+
+    // Write config which instructs luals to look in the .luals directory for type-stubs
+    const luals_conf = try std.fs.cwd().createFile(
+        ".luarc.json",
+        .{ .read = true, .truncate = true },
+    );
+    defer luals_conf.close();
+
+    try luals_conf.writeAll(
+        \\{
+        \\    "workspace.library": [
+        \\        "./.luals",
+        \\    ]
+        \\}
+    );
+}
+
 pub fn main() !void {
     var app = yazap.App.init(std.heap.page_allocator, "htt", "general-purpose template-driven code generator");
     defer app.deinit();
@@ -153,9 +188,20 @@ pub fn main() !void {
     var htt = app.rootCommand();
 
     try htt.addArg(Arg.singleValueOption("out-dir", 'o', "directory where files are rendered out to (default: same as script file)"));
+    try htt.addArg(Arg.booleanOption("init-lsp-conf", null, "Write LuaCATS type-stub file for HTT, so LuaLS can offer completions and type-checking"));
     try htt.addArg(Arg.positional("script", "path to your script", null));
     const matches = try app.parseProcess();
 
+    if (matches.containsArg("init-lsp-conf")) {
+        if (matches.containsArg("script")) {
+            std.debug.print("Cannot provide a script to run when generating type-stubs\n", .{});
+            std.process.exit(1);
+        }
+        write_typestubs(matches.getSingleValue("out-dir")) catch {
+            std.process.exit(1);
+        };
+        return;
+    }
     if (matches.containsArg("script")) {
         const script_fpath = matches.getSingleValue("script").?;
         run(script_fpath, matches.getSingleValue("out-dir")) catch {

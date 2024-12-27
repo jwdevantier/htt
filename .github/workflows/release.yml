@@ -56,7 +56,7 @@ jobs:
           tag_name: ${{ inputs.version }}
           body: |
             Release ${{ inputs.version }}
-            
+
             Available binaries:
             - Linux (x86_64, ARM64)
             - Windows (x86_64, ARM64)

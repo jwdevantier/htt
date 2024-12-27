@@ -1,6 +1,7 @@
 % @code
 local C = require "//common.htt"
 local T = require "//tags"
+local e = require "elems"
 local code = T.code
 local i = T.i
 local xref = C.xref
@@ -9,6 +10,10 @@ local raw = T.raw
 local stx = "//examples/syntax/examples.htt"
 % @end
 
+
+% @component grammarItem
+{{@ C.code {text = ctx.code}}} - {{ ctx.text }}
+% @end
 
 % @component stxComponent
 {{ raw "% @end"}}
@@ -96,17 +101,21 @@ It may sound technical, but it is simple. A line continuation is just that, a co
 <p class="mb-2">
 The following is a definition of the HTT grammar.
 {{T.h4 "How to read the grammar"}}
-{{T.beginUList}}
-<li>{{code "// ..."}} this is a comment</li>
-<li>{{code "&lt;rule-name&gt; ="}} is the start of a rule</li>
-<li>{{code "  | ..."}} - is the start of one (of possibly several) definitions of the rule</li>
-<li>{{code "  . ..."}} - means the definition spans multiple lines and this is the next one</li>
-<li>{{code "&lt;rule&gt;*"}} means 0 or more repetitions of {{code "rule"}}</li>
-<li>{{code "&lt;rule&gt;+"}} means 1 or more repetitions of {{code "rule"}}</li>
-<li>{{code "&lt;rule&gt;?"}} means zero or 1 repetitions of {{code "rule"}}</li>
-<li>{{code "'...'"}} (anything in single-quotes) is a literal value</li>
-{{T.endUList}}
+% @code
+local grammar_def = e.ul {
+    e.li {grammarItem, { code = "// ...", text = "this is a comment"} },
+    e.li {grammarItem, { code = "&lt;rule-name&gt; =", text = "the name of a rule"} },
+    e.li {grammarItem, { code = "  | ...", text = "the start a definition of the rule (there may be several)"} },
+    e.li {grammarItem, { code = "  . ...", text = "this is a continuation of the previous rule definition"} },
+    e.li {grammarItem, { code = "&lt;rule&gt;*", text = "0 or more repetitions of rule"} },
+    e.li {grammarItem, { code = "&lt;rule&gt;+", text = "1 or more repetitions of rule"} },
+    e.li {grammarItem, { code = "&lt;rule&gt;?", text = "0 or 1 repetitions of rule"} },
+    e.li {grammarItem, { code = "'...'", text = "anything in single quotes is a literal value"} },
+}
+% @end
+{{@ C.list grammar_def }}
 ~></p>
+
 {{T.h4 "Grammar"}}
 {{@ C.include {file = "examples/syntax/grammar.txt"} }}
 % -- end of document
