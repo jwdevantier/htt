@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2 font-bold">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">htt.tcp</h1>
+            <ul x-data="initApiModuleState()">
+            <li>
+              <div @click="openApiDefs[6] = !openApiDefs[6]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[6]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[6]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">A</span><span class="font-mono font-bold text-gray-700">Endpoint</span></span>
+              </div>
+              <div x-show="openApiDefs[6]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Value representing an IP address and port
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Definition</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">userdata</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[7] = !openApiDefs[7]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[7]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[7]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">T</span><span class="font-mono font-bold text-gray-700">Stream</span></span>
+              </div>
+              <div x-show="openApiDefs[7]" class="pl-2 mb-4">
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Methods</span>
+              </div>
+              <div class="ml-2">
+              <ul>
+              <li>
+                <div @click="openApiDefs[8] = !openApiDefs[8]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[8]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[8]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">recv(htt.tcp.Buffer, integer) &rarr; integer?, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[8]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Receive data from TCP stream
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">buf: htt.tcp.Buffer</span>
+                  <ul class="list-inside ml-4"><li>Buffer of data to send</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">n: integer</span>
+                  <ul class="list-inside ml-4"><li>if provided, read exactly `n` bytes</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer?</span>
+                  <ul class="list-inside ml-4"><li>number of bytes sent</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">string?</span>
+                  <ul class="list-inside ml-4"><li>error message, on error</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[9] = !openApiDefs[9]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[9]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[9]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">recv_at_least(htt.tcp.Buffer, integer) &rarr; integer?, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[9]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Receive at least N bytes from TCP stream
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">buf: htt.tcp.Buffer</span>
+                  <ul class="list-inside ml-4"><li>Buffer of data to send</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">n: integer</span>
+                  <ul class="list-inside ml-4"><li>read at least this many bytes</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer?</span>
+                  <ul class="list-inside ml-4"><li>number of bytes sent</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">string?</span>
+                  <ul class="list-inside ml-4"><li>error message, on error</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[10] = !openApiDefs[10]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[10]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[10]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">send(htt.tcp.Buffer, integer?) &rarr; string?</code></span>
+                </div>
+                <div x-show="openApiDefs[10]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Send bytes over TCP stream
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">buffer: htt.tcp.Buffer</span>
+                  <ul class="list-inside ml-4"><li>Buffer</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">n: integer?</span>
+                  <ul class="list-inside ml-4"><li>if set, send the first n bytes, not entire buffer</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              </div>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[11] = !openApiDefs[11]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[11]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[11]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">T</span><span class="font-mono font-bold text-gray-700">Buffer</span></span>
+              </div>
+              <div x-show="openApiDefs[11]" class="pl-2 mb-4">
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Methods</span>
+              </div>
+              <div class="ml-2">
+              <ul>
+              <li>
+                <div @click="openApiDefs[12] = !openApiDefs[12]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[12]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[12]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">remaining() &rarr; integer?</code></span>
+                </div>
+                <div x-show="openApiDefs[12]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return number of bytes between current position and end of buffer</p>
+                <p class="mb-2">
+                NOTE: the position is modified by `seek()` and reported by `tell()`
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer?</span>
+                  <ul class="list-inside ml-4"><li>Number of bytes from current position to end of buffer</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[13] = !openApiDefs[13]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[13]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[13]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">size() &rarr; integer?</code></span>
+                </div>
+                <div x-show="openApiDefs[13]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return current size of the buffer in bytes.</p>
+                <p class="mb-2">
+                NOTE: Use setSize to grow or shrink the buffer.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer?</span>
+                  <ul class="list-inside ml-4"><li>Size of buffer in bytes</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[14] = !openApiDefs[14]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[14]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[14]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">set_size(integer) &rarr; integer?</code></span>
+                </div>
+                <div x-show="openApiDefs[14]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return current size of the buffer in bytes.</p>
+                <p class="mb-2">
+                NOTE: Use setSize to grow or shrink the buffer.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">N: integer</span></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer?</span>
+                  <ul class="list-inside ml-4"><li>Size of buffer in bytes</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[15] = !openApiDefs[15]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[15]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[15]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">seek(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[15]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Sets the buffer position to N bytes from the start
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">N: integer</span>
+                  <ul class="list-inside ml-4"><li>The byte offset to seek to</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[16] = !openApiDefs[16]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[16]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[16]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">tell() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[16]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reports the offset, in bytes, from the start of the buffer.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">position: integer</span>
+                  <ul class="list-inside ml-4"><li>offset, in bytes, from the buffer's start</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[17] = !openApiDefs[17]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[17]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[17]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_string(string) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[17]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write string to buffer.</p>
+                <p class="mb-2">
+                Raises an error if writing the string would go out-of-bounds.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">str: string</span>
+                  <ul class="list-inside ml-4"><li>the string to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[18] = !openApiDefs[18]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[18]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[18]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_bool(boolean) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[18]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write boolean to buffer.</p>
+                <p class="mb-2">
+                Raises an error if writing the boolean would go out-of-bounds.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: boolean</span>
+                  <ul class="list-inside ml-4"><li>the value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[19] = !openApiDefs[19]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[19]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[19]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_string(integer) &rarr; string</code></span>
+                </div>
+                <div x-show="openApiDefs[19]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Read `len` bytes from buffer and return it as a string.</p>
+                <p class="mb-2">
+                Raises an error if reading the string would go out-of-bounds.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">len: integer</span>
+                  <ul class="list-inside ml-4"><li>length, in bytes, of string</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">string</span>
+                  <ul class="list-inside ml-4"><li>the string value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[20] = !openApiDefs[20]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[20]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[20]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_bool() &rarr; boolean</code></span>
+                </div>
+                <div x-show="openApiDefs[20]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Read boolean value from buffer</p>
+                <p class="mb-2">
+                Reads a full byte, anything but 0 is treated as true.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                  <ul class="list-inside ml-4"><li>the boolean value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[21] = !openApiDefs[21]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[21]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[21]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i8be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[21]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 8 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[22] = !openApiDefs[22]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[22]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[22]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i16be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[22]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 16 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[23] = !openApiDefs[23]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[23]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[23]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i32be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[23]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 32 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[24] = !openApiDefs[24]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[24]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[24]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i64be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[24]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 64 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[25] = !openApiDefs[25]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[25]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[25]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i8le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[25]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 8 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[26] = !openApiDefs[26]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[26]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[26]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i16le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[26]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 16 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[27] = !openApiDefs[27]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[27]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[27]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i32le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[27]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 32 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[28] = !openApiDefs[28]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[28]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[28]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i64le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[28]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 64 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[29] = !openApiDefs[29]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[29]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[29]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i8(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[29]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 8 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[30] = !openApiDefs[30]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[30]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[30]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i16(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[30]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 16 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[31] = !openApiDefs[31]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[31]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[31]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i32(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[31]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 32 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[32] = !openApiDefs[32]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[32]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[32]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_i64(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[32]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write signed 64 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[33] = !openApiDefs[33]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[33]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[33]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u8be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[33]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 8 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[34] = !openApiDefs[34]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[34]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[34]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u16be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[34]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 16 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[35] = !openApiDefs[35]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[35]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[35]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u32be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[35]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 32 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[36] = !openApiDefs[36]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[36]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[36]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u64be(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[36]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 64 bits integer to buffer in big-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[37] = !openApiDefs[37]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[37]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[37]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u8le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[37]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 8 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[38] = !openApiDefs[38]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[38]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[38]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u16le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[38]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 16 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[39] = !openApiDefs[39]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[39]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[39]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u32le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[39]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 32 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[40] = !openApiDefs[40]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[40]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[40]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u64le(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[40]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 64 bits integer to buffer in little-endian order</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[41] = !openApiDefs[41]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[41]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[41]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u8(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[41]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 8 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[42] = !openApiDefs[42]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[42]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[42]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u16(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[42]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 16 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[43] = !openApiDefs[43]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[43]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[43]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u32(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[43]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 32 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[44] = !openApiDefs[44]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[44]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[44]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">write_u64(integer) &rarr; nil</code></span>
+                </div>
+                <div x-show="openApiDefs[44]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Write unsigned 64 bits integer to buffer</p>
+                <p class="mb-2">
+                Raises error if writing value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">val: integer</span>
+                  <ul class="list-inside ml-4"><li>value to write</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <span>No return value</span>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[45] = !openApiDefs[45]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[45]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[45]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i8be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[45]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 8 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[46] = !openApiDefs[46]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[46]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[46]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i16be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[46]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 16 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[47] = !openApiDefs[47]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[47]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[47]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i32be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[47]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 32 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[48] = !openApiDefs[48]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[48]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[48]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i64be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[48]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 64 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[49] = !openApiDefs[49]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[49]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[49]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i8le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[49]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 8 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[50] = !openApiDefs[50]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[50]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[50]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i16le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[50]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 16 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[51] = !openApiDefs[51]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[51]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[51]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i32le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[51]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 32 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[52] = !openApiDefs[52]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[52]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[52]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i64le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[52]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 64 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[53] = !openApiDefs[53]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[53]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[53]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i8() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[53]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 8 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[54] = !openApiDefs[54]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[54]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[54]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i16() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[54]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 16 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[55] = !openApiDefs[55]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[55]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[55]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i32() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[55]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 32 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[56] = !openApiDefs[56]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[56]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[56]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_i64() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[56]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a signed 64 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[57] = !openApiDefs[57]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[57]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[57]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u8be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[57]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 8 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[58] = !openApiDefs[58]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[58]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[58]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u16be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[58]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 16 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[59] = !openApiDefs[59]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[59]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[59]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u32be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[59]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 32 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[60] = !openApiDefs[60]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[60]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[60]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u64be() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[60]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 64 bits integer from buffer, converts from big-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[61] = !openApiDefs[61]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[61]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[61]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u8le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[61]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 8 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[62] = !openApiDefs[62]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[62]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[62]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u16le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[62]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 16 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[63] = !openApiDefs[63]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[63]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[63]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u32le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[63]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 32 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[64] = !openApiDefs[64]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[64]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[64]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u64le() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[64]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 64 bits integer from buffer, converts from little-endian- to native byte-order</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value converted to native byte order</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[65] = !openApiDefs[65]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[65]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[65]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u8() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[65]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 8 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[66] = !openApiDefs[66]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[66]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[66]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u16() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[66]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 16 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[67] = !openApiDefs[67]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[67]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[67]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u32() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[67]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 32 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[68] = !openApiDefs[68]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[68]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[68]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">read_u64() &rarr; integer</code></span>
+                </div>
+                <div x-show="openApiDefs[68]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Reads a unsigned 64 bits integer from buffer</p>
+                <p class="mb-2">
+                Raises error if reading value would be out-of-bounds
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">integer</span>
+                  <ul class="list-inside ml-4"><li>the integer value</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              </div>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[69] = !openApiDefs[69]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[69]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[69]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">buffer(integer) &rarr; htt.tcp.Buffer, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[69]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Create a new buffer object</p>
+              <p class="mb-2">
+              Buffers can grow and shrink, but only in response to explicit `set_size` calls.
+              Otherwise, attempting to read- or write past buffer bounds will raise an error.</p>
+              <p class="mb-2">
+              A buffer maintains a position, which marks the start of every read- and write
+              operation. Every read- and write- operation will appropriately advance the position.
+              To get the position, call `tell()`, which returns some value between 0 and the buffer's size.
+              You can also manually change the position by calling `seek(N)`.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">size: integer</span>
+                <ul class="list-inside ml-4"><li>initial size, in bytes, of buffer</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">buf: htt.tcp.Buffer</span>
+                <ul class="list-inside ml-4"><li>the new buffer object</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">err: string?</span>
+                <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[70] = !openApiDefs[70]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[70]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[70]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">addr(string, integer) &rarr; Endpoint, string</code></span>
+              </div>
+              <div x-show="openApiDefs[70]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns an address structure which can be passed to `connect`.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ip: string</span>
+                <ul class="list-inside ml-4"><li>the IPv4/IPv6 address</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">port: integer</span>
+                <ul class="list-inside ml-4"><li>the port of the server</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">Endpoint</span>
+                <ul class="list-inside ml-4"><li>reference to the endpoint (IP and port), if successful</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string</span>
+                <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[71] = !openApiDefs[71]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[71]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[71]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">connect(Endpoint) &rarr; htt.tcp.Stream, string</code></span>
+              </div>
+              <div x-show="openApiDefs[71]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Connect to a TCP server at the IP-address and port specified by `endpoint`
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">endpoint: Endpoint</span>
+                <ul class="list-inside ml-4"><li>structure representing the endpoint</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">stream: htt.tcp.Stream</span>
+                <ul class="list-inside ml-4"><li>stream with which to communicate with the server.</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">error: string</span>
+                <ul class="list-inside ml-4"><li>error message, if any occurred.</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            </ul>
+            <script>
+            function initApiModuleState() {
+              return {
+                openApiDefs: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+              }
+            }
+            </script>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['API Documentation']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

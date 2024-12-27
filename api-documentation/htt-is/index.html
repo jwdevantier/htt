@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2 font-bold">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">htt.is</h1>
+            <p class="mb-2">
+            Validate data through composable predicate functions describing the shape of data.</p>
+            <p class="mb-2">
+            You get to declaratively describe, through composable validation functions, the valid shape(s)
+            of data, useful for constraining the data input (the model) to your templates.
+              </p>
+            <ul x-data="initApiModuleState()">
+            <li>
+              <div @click="openApiDefs[100] = !openApiDefs[100]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[100]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[100]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">A</span><span class="font-mono font-bold text-gray-700">ValidatorFn</span></span>
+              </div>
+              <div x-show="openApiDefs[100]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Function used to determine if value conforms to some specification</p>
+              <p class="mb-2">
+              A validator function returns a pair of values, a boolean which is
+              true iff the value conforms to the specification and (optionally)
+              a string message, describing the issue if the value does not conform.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Definition</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">fun (value: any): boolean, string?</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[101] = !openApiDefs[101]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[101]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[101]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">A</span><span class="font-mono font-bold text-gray-700">PredicateFn</span></span>
+              </div>
+              <div x-show="openApiDefs[101]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Function which, given a value returns true if test succeeds, false otherwise.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Definition</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">fun (value: any) boolean</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[102] = !openApiDefs[102]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[102]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[102]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">null(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[102]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is null.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[103] = !openApiDefs[103]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[103]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[103]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">boolean(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[103]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a boolean.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[104] = !openApiDefs[104]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[104]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[104]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">number(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[104]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a number.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[105] = !openApiDefs[105]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[105]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[105]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">string(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[105]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a string.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[106] = !openApiDefs[106]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[106]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[106]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">userdata(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[106]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a userdata object.
+              userdata objects are raw blocks of memory created by an external language like C
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[107] = !openApiDefs[107]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[107]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[107]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">fn(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[107]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a function.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[108] = !openApiDefs[108]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[108]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[108]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">callable(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[108]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a function.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[109] = !openApiDefs[109]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[109]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[109]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">table(any) &rarr; boolean, string?</code></span>
+              </div>
+              <div x-show="openApiDefs[109]" class="pl-2 mb-4">
+              <p class="mb-2">
+              True iff. `value` is a table.</p>
+              <p class="mb-2">
+              Note that tables can *also* be callable if they implement the __call metamethod
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">value: any</span>
+                <ul class="list-inside ml-4"><li>some input value to test</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                <ul class="list-inside ml-4"><li>a boolean, true if the value was deemed valid</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">string?</span>
+                <ul class="list-inside ml-4"><li>error message if validation failed</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[110] = !openApiDefs[110]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[110]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[110]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">optional(ValidatorFn) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[110]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns a function which tests input value iff. not nil
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">validator: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>a validate function like htt.is.null</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[111] = !openApiDefs[111]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[111]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[111]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">pred(PredicateFn, string) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[111]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Wraps `pred` and returns a validator function.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">pred: PredicateFn</span>
+                <ul class="list-inside ml-4"><li>a predicate function (a function taking a single argument and returning a bool)</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">label: string</span>
+                <ul class="list-inside ml-4"><li>a label, used to the describe the kind of test `pred` performs, used in the error message if validation fails</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[112] = !openApiDefs[112]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[112]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[112]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">any(ValidatorFn) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[112]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Wraps the provided validator functions, returning a new validator which
+              succeeds if any of the provided validators apply to the provided value.</p>
+              <p class="mb-2">
+              Read as: if any of these validator apply, the data is valid.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">...: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>one or more validator functions to test again</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[113] = !openApiDefs[113]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[113]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[113]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">all(ValidatorFn) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[113]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Wraps the provided validator functions, returning a new validator which
+              succeeds if all of the provided validators apply to the provided value.</p>
+              <p class="mb-2">
+              Read as: if all of these validators apply, the data is valid.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">...: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>one or more validator functions to test again</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[114] = !openApiDefs[114]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[114]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[114]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">list_of(ValidatorFn) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[114]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Wraps the provided validator, returning a validator which succeeds if
+              provided a list where each element is valid according to `validator`.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">validator: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator to apply to each element of the list</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[115] = !openApiDefs[115]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[115]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[115]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">table_with(table) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[115]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns a validator which takes an input value and returns true if value is a table
+              where for each entry in `spec`, there is a value which conforms to the corresponding validator</p>
+              <p class="mb-2">
+              Read as: I want to validate associative tables, I don't care about *all* their entries, but 
+                       for some of the keys, I want to associate validator functions to constrain valid values.
+                       An input value (a table) is valid if all entries constrained by a validator function in `spec`
+                       succeed their validaton.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">spec: table</span>
+                <ul class="list-inside ml-4"><li>a table whose keys point to validator functions</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[116] = !openApiDefs[116]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[116]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[116]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">table_of(ValidatorFn, ValidatorFn) &rarr; ValidatorFn</code></span>
+              </div>
+              <div x-show="openApiDefs[116]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns a validator which succeeds if the input is a table whose keys all succeed when tested
+              against `keyValidator` and whose values all succeed when tested against `valValidator`.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">keyValidator: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator to apply to each key</li></ul></li>
+              <li><span class="font-mono font-bold text-gray-700">valValidator: ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator to apply to each value</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">ValidatorFn</span>
+                <ul class="list-inside ml-4"><li>validator function</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            </ul>
+            <script>
+            function initApiModuleState() {
+              return {
+                openApiDefs: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+              }
+            }
+            </script>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['API Documentation']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

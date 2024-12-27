@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2 font-bold">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">htt.fs</h1>
+            <ul x-data="initApiModuleState()">
+            <li>
+              <div @click="openApiDefs[80] = !openApiDefs[80]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[80]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[80]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">T</span><span class="font-mono font-bold text-gray-700">ftype</span></span>
+              </div>
+              <div x-show="openApiDefs[80]" class="pl-2 mb-4">
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Fields</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">label: string</span>
+                <ul class="list-inside ml-4"><li>string representation of enum value</li></ul></li>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[81] = !openApiDefs[81]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[81]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[81]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">A</span><span class="font-mono font-bold text-gray-700">DirIterator</span></span>
+              </div>
+              <div x-show="openApiDefs[81]" class="pl-2 mb-4">
+              <p class="mb-2">
+              An iterator function returning pairs of path and 'file' type</p>
+              <p class="mb-2">
+              An iterator function which, when called, returns a pair of values
+              until such time as there are no more values.</p>
+              <p class="mb-2">
+              The path value is the file-system path to the entry (file or directory)
+              and the ftype value is an enumeration type describing the actual type of
+              the entry, notably whether a file or directory.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Definition</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">fun(): path, htt.fs.ftype</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[82] = !openApiDefs[82]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[82]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[82]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">A</span><span class="font-mono font-bold text-gray-700">path</span></span>
+              </div>
+              <div x-show="openApiDefs[82]" class="pl-2 mb-4">
+              <p class="mb-2">
+              A string representing some file system path.</p>
+              <p class="mb-2">
+              Note that the actual path separator string can be gotten with htt.fs.sep.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Definition</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">string</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[83] = !openApiDefs[83]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[83]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[83]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">cwd() &rarr; htt.fs.Dir</code></span>
+              </div>
+              <div x-show="openApiDefs[83]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Return handle to directory at current working directory (CWD).
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">dir: htt.fs.Dir</span>
+                <ul class="list-inside ml-4"><li>handle to current working directory</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[84] = !openApiDefs[84]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[84]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[84]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">C</span><span class="font-mono font-bold text-gray-700">sep</span></span>
+              </div>
+              <div x-show="openApiDefs[84]" class="pl-2 mb-4">
+              <p class="mb-2">
+              The string used for path separation on this platform.
+                </p>
+              
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Type</span>
+              </div>
+              <span class="font-mono font-bold text-gray-700">string</span>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[85] = !openApiDefs[85]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[85]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[85]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">path(path) &rarr; path</code></span>
+              </div>
+              <div x-show="openApiDefs[85]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Convert `path` from using '/' to using the OS-dependent path separator.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path: path</span>
+                <ul class="list-inside ml-4"><li>file-system path with '/' used as path separator</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path</span>
+                <ul class="list-inside ml-4"><li>path converted to using OS-dependent path separator</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[86] = !openApiDefs[86]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[86]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[86]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">path_join(string) &rarr; path</code></span>
+              </div>
+              <div x-show="openApiDefs[86]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Joins a series of path components into a path using the OS-specific path separator
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">...: string</span>
+                <ul class="list-inside ml-4"><li>path components</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path</span>
+                <ul class="list-inside ml-4"><li>joined path</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[87] = !openApiDefs[87]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[87]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[87]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">dirname(path) &rarr; path</code></span>
+              </div>
+              <div x-show="openApiDefs[87]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Given a path, strips last component from path and returns it</p>
+              <p class="mb-2">
+              If path is the root directory, returns the empty string.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path: path</span>
+                <ul class="list-inside ml-4"><li>file-system path string</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path</span>
+                <ul class="list-inside ml-4"><li>path to parent directory</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[88] = !openApiDefs[88]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[88]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[88]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">basename(path) &rarr; string</code></span>
+              </div>
+              <div x-show="openApiDefs[88]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns the last component of a file path, excluding trailing separators.</p>
+              <p class="mb-2">
+              Returns empty string if applied to root path or root of drive.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Parameters</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path: path</span>
+                <ul class="list-inside ml-4"><li>file-system path string</li></ul></li>
+              </ul>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">string</span>
+                <ul class="list-inside ml-4"><li>name of last component in path</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[89] = !openApiDefs[89]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[89]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[89]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">null_file() &rarr; path</code></span>
+              </div>
+              <div x-show="openApiDefs[89]" class="pl-2 mb-4">
+              <p class="mb-2">
+              Returns the OS-specific 'null' file, such as /dev/null for POSIX-compliant systems.
+                </p>
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Returns</span>
+              </div>
+              <ul class="list-disc list-inside">
+              <li><span class="font-mono font-bold text-gray-700">path</span>
+                <ul class="list-inside ml-4"><li>path to null file</li></ul></li>
+              </ul>
+              </div>
+            </li>
+            <li>
+              <div @click="openApiDefs[90] = !openApiDefs[90]" class="flex justify-left items-center cursor-pointer py-2">
+                <svg x-show="!openApiDefs[90]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <svg x-show="openApiDefs[90]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                </svg>
+                <span><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">T</span><span class="font-mono font-bold text-gray-700">Dir</span></span>
+              </div>
+              <div x-show="openApiDefs[90]" class="pl-2 mb-4">
+              <div>
+              <span class="text-sm text-gray-600 mb-1">Methods</span>
+              </div>
+              <div class="ml-2">
+              <ul>
+              <li>
+                <div @click="openApiDefs[91] = !openApiDefs[91]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[91]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[91]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">path() &rarr; path?</code></span>
+                </div>
+                <div x-show="openApiDefs[91]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Get canonical absolute path to this directory.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">path?</span>
+                  <ul class="list-inside ml-4"><li>path on success, nil otherwise</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[92] = !openApiDefs[92]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[92]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[92]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">make_path(path) &rarr; nil, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[92]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Iteratively creates directory at every level of the provided sub path.</p>
+                <p class="mb-2">
+                Returns success if path already exists and is a directory.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">subpath: path</span>
+                  <ul class="list-inside ml-4"><li>path of dirs, relative to dir, to create</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">nil</span>
+                  <ul class="list-inside ml-4"><li>always nil</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if error</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[93] = !openApiDefs[93]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[93]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[93]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">open_dir(string) &rarr; htt.fs.Dir, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[93]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Open directory at `subpath`.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">subpath: string</span>
+                  <ul class="list-inside ml-4"><li>path relative to dir of directory to open</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">directory: htt.fs.Dir</span>
+                  <ul class="list-inside ml-4"><li>handle to the opened directory</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[94] = !openApiDefs[94]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[94]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[94]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">parent() &rarr; htt.fs.Dir, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[94]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Open parent directory.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">directory: htt.fs.Dir</span>
+                  <ul class="list-inside ml-4"><li>handle to the opened directory</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[95] = !openApiDefs[95]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[95]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[95]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">list() &rarr; htt.fs.DirIterator, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[95]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return iterator to loop over all items in directory.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">it: htt.fs.DirIterator</span>
+                  <ul class="list-inside ml-4"><li>iterator for iterating over all items in directory</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[96] = !openApiDefs[96]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[96]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[96]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">walk() &rarr; htt.fs.DirIterator, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[96]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return iterator for recursively iterating through all contents nested under dir.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">it: htt.fs.DirIterator</span>
+                  <ul class="list-inside ml-4"><li>iterator for recursively iterate over a directory</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[97] = !openApiDefs[97]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[97]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[97]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">remove(string?) &rarr; nil, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[97]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Remove item at subpath (or directory itself).</p>
+                <p class="mb-2">
+                For directories, this will recursively remove the directory itself and all its contents.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">subpath: string?</span>
+                  <ul class="list-inside ml-4"><li>(optional) a path relative to this directory. Otherwise this directory.</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">nil</span>
+                  <ul class="list-inside ml-4"><li>unused</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[98] = !openApiDefs[98]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[98]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[98]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">exists(string?) &rarr; boolean, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[98]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Return true if item at subpath, relative to directory, exists.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">subpath: string?</span>
+                  <ul class="list-inside ml-4"><li>(optional) either check subpath relative to directory, or directory itself</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">boolean</span>
+                  <ul class="list-inside ml-4"><li>true if an item at subpath exists</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              <ul>
+              <li>
+                <div @click="openApiDefs[99] = !openApiDefs[99]" class="flex justify-left items-center cursor-pointer py-2">
+                  <svg x-show="!openApiDefs[99]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                  </svg>
+                  <svg x-show="openApiDefs[99]" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                  </svg>
+                  <span><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Fn</span><code class="font-mono font-bold text-gray-700 hover:text-blue-600">touch(string) &rarr; nil, string?</code></span>
+                </div>
+                <div x-show="openApiDefs[99]" class="pl-2 mb-4">
+                <p class="mb-2">
+                Create file at subpath, relative to directory.
+                  </p>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Parameters</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">subpath: string</span>
+                  <ul class="list-inside ml-4"><li>path of file to create, relative to directory</li></ul></li>
+                </ul>
+                <div>
+                <span class="text-sm text-gray-600 mb-1">Returns</span>
+                </div>
+                <ul class="list-disc list-inside">
+                <li><span class="font-mono font-bold text-gray-700">nil</span>
+                  <ul class="list-inside ml-4"><li>unused</li></ul></li>
+                <li><span class="font-mono font-bold text-gray-700">error: string?</span>
+                  <ul class="list-inside ml-4"><li>error message, if any</li></ul></li>
+                </ul>
+                </div>
+              </li>
+              </ul>
+              </div>
+              </div>
+            </li>
+            </ul>
+            <script>
+            function initApiModuleState() {
+              return {
+                openApiDefs: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+              }
+            }
+            </script>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['API Documentation']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

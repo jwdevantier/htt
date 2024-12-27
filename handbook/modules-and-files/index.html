@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2 font-bold">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">Modules and files</h1>
+            <p class="mb-2">
+            This covers how HTT and indeed Lua resolves and imports code and how this relates to module names. This is important both when debugging errors and laying out your projects.</p>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Terminology</h2>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Template</h4>
+            <p class="mb-2">
+            A template is a <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;file&gt;.htt</code> file, written in the <a href="/htt/quick-start" class="text-blue-600">HTT template syntax</a>. HTT will compile this template to a Lua module, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;file&gt;.out.lua</code> when it is first loaded. A template may also have a companion Code file, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;file&gt;.htt.lua</code>, whose contents is <em>prepended</em> to the compiled module.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Module</h4>
+            <p class="mb-2">
+            A module is a Lua concept and is, like a Python module, some unit of code and data. A module is typically a <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">.lua</code> file which would typically "export" a table of functions and data, defining the module's public API.
+            In the broader Lua ecosystem, modules <em>may</em> be implemented in C or similar by using the C API.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Component</h4>
+            <p class="mb-2">
+            A component is a HTT concept. It is a "mini-template", a fragment of templating which can be called and passed around as a function to be rendered inside other components. See more in the <a href="/htt/quick-start#components" class="text-blue-600">Quick Start</a></p>
+            
+            <span id="script file"></span>
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Script file</h4>
+            <p class="mb-2">
+            By script file, we refer to the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;file&gt;.lua</code> file which is passed to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">htt</code> when running the program and which kicks off the code-generation process.</p>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Using code from other files</h2>
+            
+            <span id="htt root"></span>
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">HTT root</h3>
+            <p class="mb-2">
+            You start the code-generation process by passing a script file to HTT, e.g. <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">htt &lt;file&gt;.lua</code>.
+            As the script is loaded HTT resolves the path to the script file itself, and treats the directory of that file as the <em>HTT root</em>. All Lua modules and HTT template files are resolved relative to the <em>HTT root</em> directory.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Importing Lua Modules</h3>
+            <p class="mb-2">
+            When importing modules, Lua uses the string in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">package.path</code> to build a list of paths to try, in-order. We can see the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">package.path</code> by printing it:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">$ cat /tmp/test.lua
+  print(package.path)
+  $ htt /tmp/test.lua
+  /tmp/?.lua;/tmp/?/init.lua;
+  </code></pre>
+                    </div>
+                </div>
+            </div></p>
+            
+            <p class="mb-2">
+            Each path in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">package.path</code> is separated by <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">;</code>, with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">?</code> being the placeholder which is replaced by the module name (the string argument to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require</code>). </p>
+            
+            <p class="mb-2">
+            If <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">package.path</code> is <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/?.lua;/tmp/?/init.lua;</code> and we <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require("foo")</code>, Lua would:
+            <ul class="mt-2 list-disc list-inside mb-4">
+                <li>Try loading <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/foo.lua</code></li>
+                <li>(Otherwise) Try loading <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/foo/init.lua</code></li>
+                <li>Raise an error - could not find the module</li>
+            </ul>
+            
+            <p class="mb-2">
+            If <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">package.path</code> is <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/?.lua;/tmp/?/init.lua;</code> and we <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require("foo.bar")</code>, Lua would:
+            <ul class="mt-2 list-disc list-inside mb-4">
+                <li>Try loading <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/foo/bar.lua</code></li>
+                <li>(Otherwise) Try loading <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/tmp/foo/bar/init.lua</code></li>
+                <li>Raise an error - could not find the module</li>
+            </ul>
+            
+            <span id="import-htt"></span>
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Importing HTT Templates</h3>
+            <p class="mb-2">
+            HTT extends Lua's regular <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require</code> function to also work for importing HTT templates. When requiring templates, three things are different from importing regular Lua modules:
+            
+            <ul class="mt-2 list-disc list-inside mb-4">
+                <li>We start the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require</code> string with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//</code></li>
+                <li>The separator is <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/</code> (instead of Lua's <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">.</code>), also on Windows</li>
+                <li>We also write the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">.htt</code> file extension</li>
+            </ul></p>
+            
+            <p class="mb-2">
+            Basically, we write what looks like a relative path, using the Unix path-separator (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">/</code>) with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//</code> prefixed.</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">  -- look for "foo.htt", relative to HTT root
+  local mod = require("//foo.htt")
+  
+  -- look for "bar/foo.htt", relative to HTT root
+  local mod2 = require("//bar/foo.htt")
+  </code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['Handbook']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

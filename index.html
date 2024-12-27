@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2 font-bold">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">What is HTT?</h1>
+            <p class="mb-2">
+            HTT is a code-generator. It is built to help you generate code or configuration files from some high-level description which you either write yourself or get from elsewhere.</p>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">What can I do with code generation?</h2>
+            <p class="mb-4">
+            You could generate repetitive code, such as a slew of AST types in Go, dataclass-like classes in Python, a series of functions for manipulating bits without using bitfields in C and so on. The possibilities are <em>everywhere</em>.</p>
+            
+            <p class="mb-4">
+            But it is not limited to code. This site is generated using HTT. It embeds code examples from actual files, and it runs them, captures their output and embeds that also. It also generates the menu-structure and places output in a folder structure which enables user-friendly URLs.</p>
+            
+            <p class="mb-4">
+            Code generation is also great whenever crossing language- or service/application boundaries.
+            Think of programs written in different languages exchanging messages with code generated from a Protobuf description. Or of clients, whose code for interacting with a web-service is generated from its Swagger API description.</p>
+            
+            <p class="mb-4">
+            Finally, code generation is also an excellent way to address shortcomings of configuration languages like Ansible, terraform, Nix and so on.
+            If your DSL files become very long, verbose or difficult to read, perhaps it is time to do some pre-processing in a more capable language, like Lua, and generate simpler DSL files instead.</p>
+            
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: []
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

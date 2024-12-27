@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2 font-bold">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">Implementing types in Go</h1>
+            <p class="mb-2">
+            This example implements some of the AST nodes from the book, <a href="https://interpreterbook.com/" target="_blank" class="text-blue-600">Writing an Interpreter in Go</a>, specifically as implemented in <a href="https://github.com/kitasuke/monkey-go/blob/e1716fdf2e445456116fc844023a685521202f91/ast/ast.go" target="_blank" class="text-blue-600">this git repository</a>.</p>
+            
+            <p class="mb-2">
+            You will see nodes generally come in two types, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">Statement</code> and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">Expression</code>, implementing the empty method of either to mark the type of node.
+            Beyond this, nodes implement <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String</code> and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">TokenLiteral</code>, and sometimes these are implemented in the same way.</p>
+            
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Getting Started</h2>
+            <p class="mb-2">
+            We start by creating a template file, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code> and defining the package, implementing the base types and so on. All of this is regular Go code:</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> main</span></span>
+<span class="line"><span style="color:#383A42">package ast;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">import (</span></span>
+<span class="line"><span style="color:#383A42">	"bytes"</span></span>
+<span class="line"><span style="color:#383A42">	"strings"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">	"github.com/zanshin/interpreter/token"</span></span>
+<span class="line"><span style="color:#383A42">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Node interface {</span></span>
+<span class="line"><span style="color:#383A42">	TokenLiteral() string</span></span>
+<span class="line"><span style="color:#383A42">	String() string</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Statement interface {</span></span>
+<span class="line"><span style="color:#383A42">	Node</span></span>
+<span class="line"><span style="color:#383A42">	statementNode()</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Expression interface {</span></span>
+<span class="line"><span style="color:#383A42">	Node</span></span>
+<span class="line"><span style="color:#383A42">	expressionNode()</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            Rendering this essentially produces the same output:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">package ast;
+            
+            import (
+            	"bytes"
+            	"strings"
+            
+            	"github.com/zanshin/interpreter/token"
+            )
+            
+            type Node interface {
+            	TokenLiteral() string
+            	String() string
+            }
+            
+            type Statement interface {
+            	Node
+            	statementNode()
+            }
+            
+            type Expression interface {
+            	Node
+            	expressionNode()
+            }</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Rendering Nodes</h2>
+            <p class="mb-2">
+            Now let's start rendering nodes.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Defining the model</h3>
+            <p class="mb-2">
+            To start, let's define some data describing the nodes we want. When speaking of code generation, the data we are generating code from is often called the <em>model</em>. For larger projects, I would store the model in a separate file. That way, template files could refer to it.</p>
+            
+            <p class="mb-2">
+            For small, self-contained projects, we can embed the model with the template. When compiling a template file (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code>), HTT will look for a corresponding Lua file (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code>) matching the name of the template file, with the prefix <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">.lua</code>.</p>
+            
+            <p class="mb-2">
+            Hence, here is the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code> file to accompany our <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code> template file:
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#A626A4">function</span><span style="color:#4078F2"> nodes</span><span style="color:#383A42">()</span></span>
+<span class="line"><span style="color:#A626A4">    return</span><span style="color:#383A42"> {</span></span>
+<span class="line"><span style="color:#383A42">        {</span></span>
+<span class="line"><span style="color:#E45649">			is_expr</span><span style="color:#383A42"> = </span><span style="color:#986801">true</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			short</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"i"</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"Identifier"</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			fields</span><span style="color:#383A42"> = {</span></span>
+<span class="line"><span style="color:#383A42">				{ </span><span style="color:#E45649">name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"Value"</span><span style="color:#383A42">, </span><span style="color:#E45649">type</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"string" </span><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">			}</span></span>
+<span class="line"><span style="color:#383A42">		},</span></span>
+<span class="line"><span style="color:#383A42">        {</span></span>
+<span class="line"><span style="color:#E45649">			is_expr</span><span style="color:#383A42"> = </span><span style="color:#986801">true</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			short</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"il"</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"IntegerLiteral"</span><span style="color:#383A42">,</span></span>
+<span class="line"><span style="color:#E45649">			fields</span><span style="color:#383A42"> = {</span></span>
+<span class="line"><span style="color:#383A42">				{ </span><span style="color:#E45649">name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"Value"</span><span style="color:#383A42">, </span><span style="color:#E45649">type</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"int64" </span><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">			}</span></span>
+<span class="line"><span style="color:#383A42">		},</span></span>
+<span class="line"><span style="color:#383A42">    }</span></span>
+<span class="line"><span style="color:#A626A4">end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div></p>
+            
+            <p class="mb-2">
+            The code in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code> is, as the name implies, regular Lua code. The function <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">nodes</code> returns a list (table) of (associative) tables, each describing a type of AST node. I like to wrap the data in a function to ensure I cannot modify global state and impact other rendering code.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Defining how to render a node</h3>
+            <p class="mb-2">
+            To use this data, let's define a component, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">node</code>, and just render out the name of the component for now:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> node</span></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Defining how to render all nodes</h3>
+            To render all nodes, we define a component <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render_nodes</code>, which loops over each entry in the model (the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">nodes</code> function in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code>) and renders it:
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> render_nodes</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">elem</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#4078F2">nodes</span><span style="color:#383A42">()) </span><span style="color:#A626A4">do</span></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> node elem</span><span style="color:#383A42"> }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            You could add these lines directly to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">main</code>. I normally would. But this way I can show you changes to this component in isolation.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Putting it all together</h3>
+            
+            <p class="mb-2">
+            Finally, we call <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render_nodes</code> from our <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">main</code> component. Since we have no data to pass to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render_nodes</code>, we pass an empty Lua table (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{}</code>).
+            
+            Our main component, thus becomes:
+            </p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> main</span></span>
+<span class="line"><span style="color:#383A42">package ast;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">import (</span></span>
+<span class="line"><span style="color:#383A42">	"bytes"</span></span>
+<span class="line"><span style="color:#383A42">	"strings"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">	"github.com/zanshin/interpreter/token"</span></span>
+<span class="line"><span style="color:#383A42">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Node interface {</span></span>
+<span class="line"><span style="color:#383A42">	TokenLiteral() string</span></span>
+<span class="line"><span style="color:#383A42">	String() string</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Statement interface {</span></span>
+<span class="line"><span style="color:#383A42">	Node</span></span>
+<span class="line"><span style="color:#383A42">	statementNode()</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">type Expression interface {</span></span>
+<span class="line"><span style="color:#383A42">	Node</span></span>
+<span class="line"><span style="color:#383A42">	expressionNode()</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> render_nodes</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Output</h4>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">package ast;
+            
+            import (
+            	"bytes"
+            	"strings"
+            
+            	"github.com/zanshin/interpreter/token"
+            )
+            
+            type Node interface {
+            	TokenLiteral() string
+            	String() string
+            }
+            
+            type Statement interface {
+            	Node
+            	statementNode()
+            }
+            
+            type Expression interface {
+            	Node
+            	expressionNode()
+            }
+            
+            Identifier
+            IntegerLiteral</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            Success! We see the names of the nodes we defined in our model below the Go code we started out with. Now we can start defining in earnest how the AST nodes are to be rendered.
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Rendering the Node struct</h2>
+            Let's start by rendering the struct for east AST node:
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> node</span></span>
+<span class="line"><span style="color:#383A42">type {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}} struct {</span></span>
+<span class="line"><span style="color:#383A42">    Token token.Token</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">field</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.fields) </span><span style="color:#A626A4">do</span></span>
+<span class="line"><span style="color:#383A42">    {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.name}} {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.type}}</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            The nodes now render as:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">type Identifier struct {
+                Token token.Token
+                Value string
+            }
+            type IntegerLiteral struct {
+                Token token.Token
+                Value int64
+            }</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            Before moving on, let's add some whitespace between components. You can do this in multiple ways, but inserting an empty line ahead of rendering each component in loop body of <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render_nodes</code> works well:
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> render_nodes</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">elem</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#4078F2">nodes</span><span style="color:#383A42">()) </span><span style="color:#A626A4">do</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> node elem</span><span style="color:#383A42"> }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            Now we get:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">
+            type Identifier struct {
+                Token token.Token
+                Value string
+            }
+            
+            type IntegerLiteral struct {
+                Token token.Token
+                Value int64
+            }</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Implementing the node interface</h2>
+            For now, we only handle nodes whose <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String</code> and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">TokenLiteral</code> implementations both return the value of <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded"><node>.Token.Literal</code>. 
+            Beyond that, we must implement either the empty function <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">expressionNode()</code> or <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">statementNode()</code>, depending on the type of node, as identified by the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">is_expr</code> field for the node in our model:
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> node</span></span>
+<span class="line"><span style="color:#383A42">type {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}} struct {</span></span>
+<span class="line"><span style="color:#383A42">    Token token.Token</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">field</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.fields) </span><span style="color:#A626A4">do</span></span>
+<span class="line"><span style="color:#383A42">    {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.name}} {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.type}}</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">if</span><span style="color:#E45649"> ctx</span><span style="color:#383A42">.is_expr == </span><span style="color:#986801">true</span><span style="color:#A626A4"> then</span></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) expressionNode() {}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">else</span></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) statementNode() {}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) TokenLiteral() string {</span></span>
+<span class="line"><span style="color:#383A42">  return {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Token.Literal</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) String() string {</span></span>
+<span class="line"><span style="color:#383A42">  return {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Token.Literal</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            Now, the code for the nodes themselves becomes:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">
+            type Identifier struct {
+                Token token.Token
+                Value string
+            }
+            
+            func (i *Identifier) expressionNode() {}
+            
+            func (i *Identifier) TokenLiteral() string {
+              return i.Token.Literal
+            }
+            
+            func (i *Identifier) String() string {
+              return i.Token.Literal
+            }
+            
+            type IntegerLiteral struct {
+                Token token.Token
+                Value int64
+            }
+            
+            func (il *IntegerLiteral) expressionNode() {}
+            
+            func (il *IntegerLiteral) TokenLiteral() string {
+              return il.Token.Literal
+            }
+            
+            func (il *IntegerLiteral) String() string {
+              return il.Token.Literal
+            }</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Overriding the String method</h2>
+            <p class="mb-2">
+            Some nodes implement a custom <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String()</code> method to stringify themselves and their contents.
+            To support this, let us extend the model such that each node can define a <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">string_fn</code> attribute, pointing to a component which implements the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String()</code> method.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Referencing components from the model.</h3>
+            <p class="mb-2">
+            Recall that we defined our components in the template <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code> and put our accompanying model in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code>, and that it is these two files combined which will </p>
+            
+            <p class="mb-2">
+            To support this, we need a way to reference the components to use for implementing the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String()</code> method. One way to solve this is to send along a reference to the module generated from the template file itself.</p>
+            
+            <p class="mb-2">
+            All templates can use the variable <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">M</code> to refer to their own modules. So we can just send this along to the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">nodes()</code> function which returns the model:</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> render_nodes</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">elem</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#4078F2">nodes</span><span style="color:#383A42">(</span><span style="color:#E45649">M</span><span style="color:#383A42">)) </span><span style="color:#A626A4">do</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> node elem</span><span style="color:#383A42"> }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <p class="mb-2">
+            From the model function, we can now refer to components in the template by their name. So <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">m.node</code> would refer to the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">node</code> component defined in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code></p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">function nodes(m)
+    -- `m` is a reference to the template module, now we can reference
+    -- components like `node` as `m.node`.
+end</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            With this change, we update the model, expanding the number of nodes we implement. Some, like the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ReturnStatement</code> node, will now use a custom component (here: <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">return_statement_string</code>) to implement the body of their <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String()</code> method.</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">function nodes(m)
+	return {
+		{
+			is_expr = true,
+			short = "i",
+			name = "Identifier",
+			fields = {
+				{ name = "Value", type = "string" }
+			}
+		},
+		{
+			is_expr = false,
+			short = "rs",
+			name = "ReturnStatement",
+			fields = {
+				{ name = "ReturnValue", type = "Expression" }
+			},
+			string_fn = m.return_statement_string,
+		},
+		{
+			is_expr = false,
+			short = "es",
+			name = "ExpressionStatement",
+			fields = {
+				{ name = "Expression", type = "Expression" }
+			},
+			string_fn = m.expr_statement_string,
+		},
+		{
+			is_expr = true,
+			short = "il",
+			name = "IntegerLiteral",
+			fields = {
+				{ name = "Value", type = "int64" }
+			}
+		},
+		{
+			is_expr = true,
+			short = "pe",
+			name = "PrefixExpression",
+			fields = {
+				{ name = "Operator", type = "string" },
+				{ name = "Right",    type = "Expression" },
+			},
+			string_fn = m.prefix_expr_string,
+		}
+	}
+end
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Composing components</h3>
+            <p class="mb-2">
+            The key change in the template is how we implement <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">node</code> Notice now that we check if <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx.string_fn</code> is defined, and if so, renders that component:</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> node</span></span>
+<span class="line"><span style="color:#383A42">type {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}} struct {</span></span>
+<span class="line"><span style="color:#383A42">    Token token.Token</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">for</span><span style="color:#E45649"> _</span><span style="color:#383A42">, </span><span style="color:#E45649">field</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.fields) </span><span style="color:#A626A4">do</span></span>
+<span class="line"><span style="color:#383A42">    {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.name}} {{</span><span style="color:#E45649">field</span><span style="color:#383A42">.type}}</span></span>
+<span class="line"><span style="color:#383A42">    % </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">if</span><span style="color:#E45649"> ctx</span><span style="color:#383A42">.is_expr == </span><span style="color:#986801">true</span><span style="color:#A626A4"> then</span></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) expressionNode() {}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">else</span></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) statementNode() {}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) TokenLiteral() string {</span></span>
+<span class="line"><span style="color:#383A42">  return {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Token.Literal</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">func ({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}} *{{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name}}) String() string {</span></span>
+<span class="line"><span style="color:#383A42">  % </span><span style="color:#A626A4">if</span><span style="color:#E45649"> ctx</span><span style="color:#383A42">.string_fn </span><span style="color:#A626A4">then</span></span>
+<span class="line"><span style="color:#383A42">  {{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> ctx</span><span style="color:#383A42">.string_fn</span><span style="color:#4078F2"> ctx</span><span style="color:#383A42"> }}</span></span>
+<span class="line"><span style="color:#383A42">  % </span><span style="color:#A626A4">else</span></span>
+<span class="line"><span style="color:#383A42">  return {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Token.Literal</span></span>
+<span class="line"><span style="color:#383A42">  % </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            This demonstrates how HTT components can be passed as arguments to other components which can render them. Also notice that since all compontents take exactly one table argument, we can pass all arguments along by passing <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code>.
+            These two facts combine to make components very composable.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Implementing the custom String() methods</h3>
+            <p class="mb-2">
+            The final change to the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code> template file is implementing the components for the custom <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">String()</code> methods.</p>
+            
+            <p class="mb-2">
+            There is nothing to these components aside from noting that since we passed the entire <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> from the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">node</code> component along to these, we still have access to attributes like <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">short</code> from the model describing the node.</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> return_statement_string</span></span>
+<span class="line"><span style="color:#383A42">var out bytes.Buffer</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">out.WriteString(rs.Token.Literal + " ")</span></span>
+<span class="line"><span style="color:#383A42">if rs.ReturnValue != nil {</span></span>
+<span class="line"><span style="color:#383A42">	out.WriteString(rs.ReturnValue.String())</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">out.WriteString(";")</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">return out.String()</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> expr_statement_string</span></span>
+<span class="line"><span style="color:#383A42">if {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Expression != nil {</span></span>
+<span class="line"><span style="color:#383A42">	return {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Expression.String()</span></span>
+<span class="line"><span style="color:#383A42">}</span></span>
+<span class="line"><span style="color:#383A42">return ""</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> prefix_expr_string</span></span>
+<span class="line"><span style="color:#383A42">var out bytes.Buffer</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">out.WriteString("(")</span></span>
+<span class="line"><span style="color:#383A42">out.WriteString({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Operator)</span></span>
+<span class="line"><span style="color:#383A42">out.WriteString({{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.short}}.Right.String())</span></span>
+<span class="line"><span style="color:#383A42">out.WriteString(")")</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#383A42">return out.String()</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Output</h4>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">
+            type Identifier struct {
+                Token token.Token
+                Value string
+            }
+            
+            func (i *Identifier) expressionNode() {}
+            
+            func (i *Identifier) TokenLiteral() string {
+              return i.Token.Literal
+            }
+            
+            func (i *Identifier) String() string {
+              return i.Token.Literal
+            }
+            
+            type ReturnStatement struct {
+                Token token.Token
+                ReturnValue Expression
+            }
+            
+            func (rs *ReturnStatement) statementNode() {}
+            
+            func (rs *ReturnStatement) TokenLiteral() string {
+              return rs.Token.Literal
+            }
+            
+            func (rs *ReturnStatement) String() string {
+              var out bytes.Buffer
+              
+              out.WriteString(rs.Token.Literal + " ")
+              if rs.ReturnValue != nil {
+              	out.WriteString(rs.ReturnValue.String())
+              }
+              
+              out.WriteString(";")
+              
+              return out.String()
+            }
+            
+            type ExpressionStatement struct {
+                Token token.Token
+                Expression Expression
+            }
+            
+            func (es *ExpressionStatement) statementNode() {}
+            
+            func (es *ExpressionStatement) TokenLiteral() string {
+              return es.Token.Literal
+            }
+            
+            func (es *ExpressionStatement) String() string {
+              if es.Expression != nil {
+              	return es.Expression.String()
+              }
+              return ""
+            }
+            
+            type IntegerLiteral struct {
+                Token token.Token
+                Value int64
+            }
+            
+            func (il *IntegerLiteral) expressionNode() {}
+            
+            func (il *IntegerLiteral) TokenLiteral() string {
+              return il.Token.Literal
+            }
+            
+            func (il *IntegerLiteral) String() string {
+              return il.Token.Literal
+            }
+            
+            type PrefixExpression struct {
+                Token token.Token
+                Operator string
+                Right Expression
+            }
+            
+            func (pe *PrefixExpression) expressionNode() {}
+            
+            func (pe *PrefixExpression) TokenLiteral() string {
+              return pe.Token.Literal
+            }
+            
+            func (pe *PrefixExpression) String() string {
+              var out bytes.Buffer
+              
+              out.WriteString("(")
+              out.WriteString(pe.Operator)
+              out.WriteString(pe.Right.String())
+              out.WriteString(")")
+              
+              return out.String()
+            }</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Homework: refactoring</h2>
+            <p class="mb-2">
+            I wanted to implement this piece-meal, with you looking on, to get a sense of the process rather than just seeing the finished thing. 
+            As a next step, I would refactor the model out into its own file, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast_model.lua</code>. If we did this, we would not have to pass the model (self) reference (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">M</code>) from the template to the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">nodes()</code> model function in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code>.</p>
+            <p class="mb-2">
+            To achieve this, we would:
+            <ol class="list-decimal list-inside">
+              <li>move the model code from <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt.lua</code> to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast_model.lua</code></li>
+              <li>in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code>, import the module by adding <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">% local model = require 'ast_model'</code> to the top of the file</li>
+              <li>in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast.htt</code>, change the call to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">nodes(M)</code> to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">model.nodes()</code></li>
+              <li>in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast_model.lua</code>, import the template module by adding <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">local tpl = require '//ast.htt'</code> to the top of the file.</li>
+              <li>in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ast_model.lua</code>, change all references to the model <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">m.component</code> to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">tpl.component</code>.</li>
+            </ol></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['Examples']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

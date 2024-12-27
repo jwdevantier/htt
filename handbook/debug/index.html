@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2 font-bold">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">Debug</h1>
+            <p class="mb-4">
+            You will make mistakes. Here we will discuss the types of errors you will encounter and how to read the error output.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Types of errors</h4>
+            <p class="mb-2">
+            The types of error you will encounter are:
+            <ul class="list-disc list-inside
+            ">
+            <li>Failure to load the initial script</li>
+            <li>Failue to compile some template file</li>
+            <li>Failure to load a lua module <ul class="list-disc list-inside ml-4
+            ">
+            <li>Whether Lua code or a compiled template file</li>
+            </ul></li>
+            <li>An error during evaluation of the Lua code</li>
+            </ul></p>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">How to Read Errors</h2>
+            <p class="mb-2">
+            We will revisit the specifics of this error later, but for now, let's cover some general information on reading the error.</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">resolved script_fpath: '/home/runner/work/htt/htt/docs/examples/debug/run-err-stx.lua'
+resolved htt_root: '/home/runner/work/htt/htt/docs/examples/debug'
+
+Error loading Lua module '//err-stx.htt':
+	err-stx.out.lua:7: 'then' expected near 'end'
+stack traceback:
+	[HTT Library]:514: in function <[HTT Library]:472>
+	[C]: in function 'require'
+	.../runner/work/htt/htt/docs/examples/debug/run-err-stx.lua:1: in main chunk
+	[C]: in function 'xpcall'
+	[HTT Library]:120: in function <[HTT Library]:102>
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Resolved script fpath/htt root</h4>
+            <p class="mb-2">
+            <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">script_fpath</code> refers to the script file you used as a starting-point when calling HTT, see <a href="handbook#script file" class="text-blue-600">script file</a> for details.</p>
+            
+            <p class="mb-2">
+            <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">htt_root</code> refers to the parent directory of the script file. This is the starting-point which is used when importing additional Lua modules or HTT template files, see <a href="handbook#htt root" class="text-blue-600">HTT root</a> for details.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">References to [HTT Library]</h4>
+            <p class="mb-2">
+            Many lua functions in HTT are provided in addition to the Lua standard API. <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">[HTT Library]:&lt;number&gt;</code> refers to a line within the <a href="https://github.com/jwdevantier/htt/blob/master/src/prelude.lua" target="_blank" class="text-blue-600">./src/prelude.lua</a>, which holds the definitions for this expanded standard library.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">How to read the stack trace</h4>
+            The stack trace is read from bottom (outermost) to top (innermost), meaning the error originated at the line mentioned at the first like after <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">stack traceback:</code>.
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                <span>In this case, that is in the bundled library code  (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">[[HTT Library]]</code>), line 432. In the copy of HTT used, this line marks the start of the loader function which HTT installs to intercept calls to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require "//&lt;path/to/template&gt;.htt</code>, which compile HTT templates into lua modules before loading them in as usual.</span>
+                </div>
+              </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Error Compiling HTT Template</h2>
+            <p class="mb-2">
+            Compile errors happen when a HTT file cannot be compiled to a Lua module because there is a syntax- or semantic error, which the compiler detected.</p>
+            
+            <p class="mb-2">
+            Here's a trivial example. Content (output) cannot appear outside of a component, so the first line causes a compile error:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">This line causes a compile failure
+% @component one
+% local x = false
+% if x then
+% end
+% @end</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            These errors should be the easiest to follow. They point out the file, line- and column number. In case you want to know more, it also prints which parse state the compiler was in when encountering the error:</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">resolved script_fpath: '/home/runner/work/htt/htt/docs/examples/debug/run-err-compile.lua'
+resolved htt_root: '/home/runner/work/htt/htt/docs/examples/debug'
+
+Error compiling HTT template '//err-compile.htt'
+	File: 'err-compile.htt'
+	Line: 1
+	Column: 0
+	Type: illegal_toplevel_content
+	Reason: content must be inside a component
+stack traceback:
+	[HTT Library]:506: in function <[HTT Library]:472>
+	[C]: in function 'require'
+	...ner/work/htt/htt/docs/examples/debug/run-err-compile.lua:1: in main chunk
+	[C]: in function 'xpcall'
+	[HTT Library]:120: in function <[HTT Library]:102>
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Error loading Lua module</h2>
+            <p class="mb-2">
+            The initial script is loaded in a special way. For all other modules, whether written in plain Lua or compiled from HTT templates, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">Error loading Lua module</code> means the module contains code which is not valid Lua.</p>
+            
+            <p class="mb-2">
+            In this case, we wrote <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">if x</code>, not <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">if x then</code> as is required:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> one</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">local</span><span style="color:#E45649"> x</span><span style="color:#383A42"> = </span><span style="color:#986801">false</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">if</span><span style="color:#E45649"> x</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <p class="mb-2">
+            And here is the resulting error:</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">resolved script_fpath: '/home/runner/work/htt/htt/docs/examples/debug/run-err-stx.lua'
+resolved htt_root: '/home/runner/work/htt/htt/docs/examples/debug'
+
+Error loading Lua module '//err-stx.htt':
+	err-stx.out.lua:7: 'then' expected near 'end'
+stack traceback:
+	[HTT Library]:514: in function <[HTT Library]:472>
+	[C]: in function 'require'
+	.../runner/work/htt/htt/docs/examples/debug/run-err-stx.lua:1: in main chunk
+	[C]: in function 'xpcall'
+	[HTT Library]:120: in function <[HTT Library]:102>
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            The stack trace is uninteresting in this case. We see the issue stems from a <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require</code> on line 1 of the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">start.lua</code> file, which is the intial script we passed to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">htt</code>.</p>
+            
+            <p class="mb-2">
+            However, note the error, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">Error loading Lua module</code>, and also note the name of the module, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//err-stx.htt</code>, which is a HTT template. For HTT templates, the module name reflects the path with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//</code> being the start of the path, relative to the HTT root directory.</p>
+            
+            <p class="mb-2">
+            The second thing to note is the actual error from Lua, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">err-stx.out.lua:7</code>, the result of compiling <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">err-stx.htt</code> to Lua is saved in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">err-stx.out.lua</code>, and the error in the Lua code is on line 7.</p>
+            
+            <p class="mb-2">
+            In this case, the actual error message from Lua, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">'then' expected near 'end'</code> is easy to follow. Other times, opening the compiled output is needed. Don't worry, the compiled output is written to be easy to follow.</p>
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                  <p class="font-bold text-stone-500">Reading the compiled HTT templates</p>
+                <span><p class="mb-2">
+                Every HTT template file is compiled, and the resulting Lua module is saved on disk. The result of compiling <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">foo.htt</code> is saved as <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">foo.out.lua</code> in the same directory.</p>
+                
+                <p class="mb-2">
+                The compiled output should make for easy reading, and sometimes a difficult to understand error becomes obvious when you read the relevant line in the compiled output.</p></span>
+                </div>
+              </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Error during execution</h2>
+            <p class="mb-2">
+            Template code can cause errors. If an error happens, you can determine where by examining the stack.</p>
+            
+            <p class="mb-2">
+            In this example, we have two components, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">parent</code> and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">child</code>, both defined in <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//examples/debug/err-exec.htt</code>. The <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">parent</code> calls <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">child</code> which causes a runtime error.</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> parent</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">local</span><span style="color:#E45649"> x</span><span style="color:#383A42"> = </span><span style="color:#986801">false</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">if</span><span style="color:#E45649"> x</span><span style="color:#A626A4"> then</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#383A42">Call child {{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> child</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> child</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#0184BC">error</span><span style="color:#383A42">(</span><span style="color:#50A14F">"I am raising an error"</span><span style="color:#383A42">)</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            Note in output that we see the error itself, and before that, we can see the call-stack for components, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//examples/debug/err-exec.htt.parent</code> is the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">parent</code> component, and the stack shows how it calls <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">//examples/debug/err-exec.htt.child</code> (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">child</code>).</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">resolved script_fpath: '/home/runner/work/htt/htt/docs/examples/debug/run-err-exec.lua'
+resolved htt_root: '/home/runner/work/htt/htt/docs/examples/debug'
+
+Error during execution:
+	err-exec.out.lua:5: I am raising an error
+stack traceback:
+	err-exec.out.lua:5: in function '//err-exec.htt.child'
+	[HTT Library]:457: in field 'render'
+	err-exec.out.lua:16: in function '//err-exec.htt.parent'
+	[HTT Library]:457: in local 'render_'
+	[HTT Library]:468: in field 'render'
+	[HTT Loader]:19: in function 'render'
+	...runner/work/htt/htt/docs/examples/debug/run-err-exec.lua:2: in main chunk
+	[C]: in function 'xpcall'
+	[HTT Library]:120: in function <[HTT Library]:102>
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2"></p>
+            
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['Handbook']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

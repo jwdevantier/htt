@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2 font-bold">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">Quick Start</h1>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Hello World</h2>
+            <p>HTT takes a single Lua script as its argument, from here you can generate as many files as you want by calling the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render</code> function.</p>
+            <p>Let's create a script, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">test-htt.lua</code>:</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">local tpl = require("//helloworld.htt")
+
+render(tpl.helloWorld, "result.txt")</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                <span><p>Notice the call to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">require</code>. HTT templates are transparently
+                compiled to Lua as they are first imported. Read more about importing HTT templates <a href="handbook#import-htt" class="text-blue-600">here</a></p></span>
+                </div>
+              </div>
+            </div>
+            
+            Let's then fill out the template file, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">helloworld.htt</code>:
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> helloWorld</span></span>
+<span class="line"><span style="color:#383A42">Hello, John!</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            If you now run the command <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">htt test-htt.lua</code>, then the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">result.txt</code> file will look like this:
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Hello, John!</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">To Summarize</h3>
+            <ol class="list-decimal list-inside">
+              <li>We wrote a template file, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">helloworld.htt</code>, and defined a component, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">helloWorld</code>, inside it</li>
+              <li>We wrote a Lua script, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">test-htt.lua</code>, which uses the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">render</code> call to render a component, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">helloWorld</code>, to a file: <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">result.txt</code>.</li>
+            </ol>
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Using Lua inside templates</h2>
+            <p>HTT uses plain Lua for all logic inside of templates. Any line which starts with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">%</code> is taken to be a line of Lua code injected verbatim into the compiled template.<p>
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                  <p class="font-bold text-stone-500">What about '% @component'?</p>
+                <span><p>
+                HTT interprets lines where text after <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">%</code> starts with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">@</code> differently. These lines are taken to be <em>directives</em>, of which there are currently 2: <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">@component</code> and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">@code</code>. We will cover this more below.</p></span>
+                </div>
+              </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Looping with Lua</h3>
+            <p>We can use Lua for loops to repeat a block of output like so:</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">for</span><span style="color:#E45649"> i</span><span style="color:#383A42"> = </span><span style="color:#986801">1</span><span style="color:#383A42">, </span><span style="color:#986801">3</span><span style="color:#A626A4"> do</span></span>
+<span class="line"><span style="color:#383A42">hello!</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">hello!
+            hello!
+            hello!</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Conditional rendering with Lua</h3>
+            <p>We can use Lua if-statements to decide whether to render a block of output or not:</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">if</span><span style="color:#986801"> 1</span><span style="color:#383A42"> == </span><span style="color:#986801">2</span><span style="color:#A626A4"> then</span></span>
+<span class="line"><span style="color:#383A42">Math is broken!</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">else</span></span>
+<span class="line"><span style="color:#383A42">Phew! Math works</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            If we render this component, we get:
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Phew! Math works</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Using variables in output</h3>
+            <p>You can use <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{ ... }}</code> to embed the values of variables or other expressions in the output:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">local</span><span style="color:#E45649"> name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"Peter"</span></span>
+<span class="line"><span style="color:#383A42">Hello, {{</span><span style="color:#E45649">name</span><span style="color:#383A42">}}!</span></span>
+<span class="line"><span style="color:#383A42">2 + 2 is {{</span><span style="color:#986801">2</span><span style="color:#383A42"> + </span><span style="color:#986801">2</span><span style="color:#383A42">}}</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Hello, Peter!
+            2 + 2 is 4</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                  <p class="font-bold text-stone-500">Arguments & components</p>
+                <span><p>See the the "Context" section under "Components" for information on how to pass arguments to a component and how to access them.</p></span>
+                </div>
+              </div>
+            </div>
+            
+            <span id="components"></span>
+            <h2 class="text-2xl font-bold mt-6 mb-2">Components</h2>
+            <p>Components are the unit of abstraction. Complex outputs should be built by composing smaller components into larger ones.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Calling components from within components</h3>
+            <p> To call a component, we use this syntax: <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{@ component ctx }}</code>. <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">component</code> is any component and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> is the <em>context</em> we want to pass on to the component. The context should be a Lua table and it is the way to pass arguments to the component (including other components, if you want!).</p>
+            
+            <br/>
+            <p>Given this component:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> child</span></span>
+<span class="line"><span style="color:#383A42">Sincerely hello</span></span>
+<span class="line"><span style="color:#383A42">  - Child</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Let's call it from another component.</p>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> parent</span></span>
+<span class="line"><span style="color:#383A42">let's call the child:</span></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> child</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>The output becomes:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">let's call the child:
+            Sincerely hello
+              - Child</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Providing arguments to Components</h3>
+            <p>When introducing the syntax to call a component, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{@ component ctx }}</code>, we touched on the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> being a Lua table.</p>
+            
+            <p>We first define a component which uses the argument <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">name</code>, if provided. Note that all arguments passed to a component are exposed via the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> variable. <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx.name</code> is simply the Lua way of accessing the attribute <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">name</code> on the <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> table.</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> helloName</span></span>
+<span class="line"><span style="color:#383A42">Hello, {{</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.name or </span><span style="color:#50A14F">"John Doe"</span><span style="color:#383A42">}}!</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Calling component without name argument</h4>
+            <p>Calling the component without no name:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> helloName</span><span style="color:#383A42"> {} }}</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Produces the following:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Hello, John Doe!</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Calling component with name argument</h4>
+            <p>Calling the component without no name:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> helloName</span><span style="color:#383A42"> {</span><span style="color:#E45649">name</span><span style="color:#383A42"> = </span><span style="color:#50A14F">"Peter"</span><span style="color:#383A42">} }}</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Produces the following:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Hello, Peter!</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Indentation and Components</h3>
+            A focus of HTT has been to get indentation "right". Before we summarize how it works, here's an expanded example:
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> child</span></span>
+<span class="line"><span style="color:#383A42">Sincerely hello</span></span>
+<span class="line"><span style="color:#383A42">  - Child</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> middleChild</span></span>
+<span class="line"><span style="color:#383A42">--middle child</span></span>
+<span class="line"><span style="color:#383A42">  {{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> child</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> callWithIndentation</span></span>
+<span class="line"><span style="color:#383A42">{{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> child</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">    {{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> middleChild</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">    {{</span><span style="color:#A626A4">@</span><span style="color:#4078F2"> child</span><span style="color:#383A42"> {} }}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Rendering this out gives this output:</p>
+            
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">Sincerely hello
+              - Child
+                --middle child
+                  Sincerely hello
+                    - Child
+                Sincerely hello
+                  - Child</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="text-sm my-4 bg-stone-100 border-l-4 border-stone-400 text-stone-900 px-4 py-3" role="alert">
+              <div class="flex">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-stone-400 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                <div>
+                  <p class="font-bold text-stone-500">How indentation works</p>
+                <span><p>The final indentation of any given line is the sum of:</p>
+                <ul class="mt-2 list-disc list-inside">
+                    <li>The indentation of the line itself within the component</li>
+                    <li>The indentation of the line that called its component</li>
+                    <li>The indentation of the line that called the parent component</li>
+                    <li>... and so on, all the way up the chain of component calls</li>
+                </ul>
+                
+                <p class="mt-4">This sounds complex, but feels natural. Play around and you will see how indentation generally behaves as you would expect and want.</p></span>
+                </div>
+              </div>
+            </div>
+            
+            
+            <h2 class="text-2xl font-bold mt-6 mb-2">Line Continuations</h2>
+            <p>There will be times, usually when mixing output and Lua lines, where you want to build up a single line of output across multiple lines in the template.</p>
+            
+            <p>If a line starts with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">~></code> (after whitespace), then the line is taken to be a continuation of the preceding line of output.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Simple Example</h3>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">hello</span></span>
+<span class="line"><span style="color:#A0A1A7;font-style:italic">~></span><span style="color:#383A42">world!</span></span>
+<span class="line"><span style="color:#383A42">hello</span></span>
+<span class="line"><span style="color:#A0A1A7;font-style:italic">~></span><span style="color:#383A42"> world...</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            <p>This renders out to:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">helloworld!
+            hello world...</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Realistic Example</h3>
+            <p>The following example builds up an array where elements are separated by <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">, </code>. Another example would be rendering function arguments or parameters.</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">local</span><span style="color:#E45649"> sep</span><span style="color:#383A42"> = </span><span style="color:#E45649">ctx</span><span style="color:#383A42">.separator or </span><span style="color:#50A14F">","</span></span>
+<span class="line"><span style="color:#383A42">[</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">for</span><span style="color:#E45649"> i</span><span style="color:#383A42">, </span><span style="color:#E45649">v</span><span style="color:#A626A4"> in</span><span style="color:#0184BC"> ipairs</span><span style="color:#383A42">(</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.lst) </span><span style="color:#A626A4">do</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">local</span><span style="color:#E45649"> is_last</span><span style="color:#383A42"> = (</span><span style="color:#E45649">i</span><span style="color:#383A42"> == #</span><span style="color:#E45649">ctx</span><span style="color:#383A42">.lst)</span></span>
+<span class="line"><span style="color:#A0A1A7;font-style:italic">~></span><span style="color:#383A42"> "{{</span><span style="color:#E45649">v</span><span style="color:#383A42">}}"{{not </span><span style="color:#E45649">is_last</span><span style="color:#383A42"> and </span><span style="color:#E45649">sep</span><span style="color:#383A42"> or </span><span style="color:#50A14F">""</span><span style="color:#383A42">}}</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">end</span></span>
+<span class="line"><span style="color:#A0A1A7;font-style:italic">~></span><span style="color:#383A42"> ]</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            <p>This renders out to:</p>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">[ "one", "two", "three" ]</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p>The line printing the separator uses a trick in Lua to simulate a ternary-if: <div><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">$test and $if-truthy or $otherwise</code>.</div>
+            Alternatively, we could have used an if-block instead.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: []
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>

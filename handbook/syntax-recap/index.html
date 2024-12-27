@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <style>
+        html, body { height: 100%; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-full" x-data="initState()">
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-md shadow-gray-300/50 z-50">
+        <div class="flex justify-between items-center p-4">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold">HTT Documentation</h1>
+        </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar (desktop) / Mobile menu -->
+        <div :class="{'fixed inset-y-0 left-0 transform translate-x-0 z-50': mobileMenuOpen, 'fixed inset-y-0 left-0 transform -translate-x-full z-50': !mobileMenuOpen, 'md:relative md:translate-x-0': true}"
+             class="bg-gray-100 w-64 flex-shrink-0 border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto h-full">
+            <div class="pl-4">
+                <nav class="text-sm">
+                    <ul>
+                        <li class="hover:bg-gray-200"><a href="/htt/" class="pl-2 text-blue-600 block w-full h-full py-2">What is HTT?</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/setup" class="pl-2 text-blue-600 block w-full h-full py-2">Setup</a></li>
+                        <li class="hover:bg-gray-200"><a href="/htt/quick-start" class="pl-2 text-blue-600 block w-full h-full py-2">Quick Start</a></li>
+                        <li>
+                            <div @click="openSections.includes('Handbook') ? openSections = openSections.filter(i => i !== 'Handbook') : openSections.push('Handbook')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Handbook</span>
+                                <svg x-show="!openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Handbook')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Handbook')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/syntax-recap" class="text-gray-500 block w-full h-full py-2 font-bold">Syntax Recap</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/debug" class="text-gray-500 block w-full h-full py-2">Debug</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/handbook/modules-and-files" class="text-gray-500 block w-full h-full py-2">Modules and files</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('Examples') ? openSections = openSections.filter(i => i !== 'Examples') : openSections.push('Examples')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>Examples</span>
+                                <svg x-show="!openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('Examples')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('Examples')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/examples/implementing-types-in-go" class="text-gray-500 block w-full h-full py-2">Implementing types in Go</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div @click="openSections.includes('API Documentation') ? openSections = openSections.filter(i => i !== 'API Documentation') : openSections.push('API Documentation')"
+                                    class="pl-2 flex justify-between items-center cursor-pointer text-blue-600 hover:bg-gray-200 py-2">
+                                <span>API Documentation</span>
+                                <svg x-show="!openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </svg>
+                                <svg x-show="openSections.includes('API Documentation')" class="w-4 h-4 text-gray-500 mr-2" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </svg>
+                            </div>
+                            <ul x-show="openSections.includes('API Documentation')" class="ml-2">
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-str" class="text-gray-500 block w-full h-full py-2">htt.str</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-env" class="text-gray-500 block w-full h-full py-2">htt.env</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-tcp" class="text-gray-500 block w-full h-full py-2">htt.tcp</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-time" class="text-gray-500 block w-full h-full py-2">htt.time</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-fs" class="text-gray-500 block w-full h-full py-2">htt.fs</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-is" class="text-gray-500 block w-full h-full py-2">htt.is</a></li>
+                                <li class="hover:bg-gray-200 pl-2"><a href="/htt/api-documentation/htt-json" class="text-gray-500 block w-full h-full py-2">htt.json</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0">
+            <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-5">Syntax Recap</h1>
+            <p class="mb-2">
+            This section is just a minimal recap of the HTT templating syntax so you have the proper vocabulary in place and can visually recognize the various parts of the syntax.</p>
+            <p class="mb-2">
+            To learn how to <em>apply</em> this syntax and write actual templates, see the <a href="/htt/quick-start" class="text-blue-600">Quick Start</a> guide.</p>
+            
+            <p class="mb-2">
+            Finally, you may actually want to see a condensed grammar definition. If so, click <a href="handbook#grammar" class="text-blue-600">here</a></p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Literal Text</h3>
+            <p class="mb-2">
+            The majority of the template will probably be literal text.
+            Any text which is not triggering any of the syntax rules below is rendered exactly as you typed it in. This is what permits most templates to still be recognizable to people understanding the eventual output.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Lua Line</h3>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A0A1A7;font-style:italic">--[[ lua code here ]]--</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            Lua lines begin with are lines whose first non-whitespace character is <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">%</code>. The remainder of the line is handled as Lua code and inserted verbatim in the compiled Template's output.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Directives</h3>
+            <p class="mb-2">
+            Directives are blocks with a defined start- (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">% @&lt;directive type&gt;</code>) and end (<code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">% @end</code>).
+            Directives cannot partially overlap, but <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">code</code>-directives can be nested inside <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">component</code>-directives.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Component</h4>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@component</span><span style="color:#E45649"> myComponent</span></span>
+<span class="line"><span style="color:#383A42">... content here :)</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mb-2">
+            References to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx</code> within the component refers to the Lua table which holds all arguments passed to the component when called.</p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">(Lua) Code</h4>
+            <p class="mb-2">
+            You can write blocks of verbatim Lua code by wrapping it in a <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">@code</code> directive:</p>
+            <div class="code-container relative my-4">
+                <div style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#657B83" class="p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800"><pre class="shiki one-light" style="background-color:rgb(245 245 244 / var(--tw-bg-opacity));color:#383A42" tabindex="0"><code><span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@code</span></span>
+<span class="line"><span style="color:#A0A1A7;font-style:italic">-- lua code here</span></span>
+<span class="line"><span style="color:#383A42">% </span><span style="color:#A626A4">@end</span></span></code></pre></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">(Lua) Expressions</h3>
+            <p class="mb-2">
+            Whenever you see <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{ ... }}</code>, it is a Lua expression.</p>
+            <p class="mb-2">
+            Expressions are evaluated and <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">tostring()</code> is called on their value and it is this value which is embedded in the output.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Component Render Call</h3>
+            <p class="mb-2">
+            Calls of the form <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{&lt;component&gt; &lt;lua-table-expr&gt;}}</code>.</p> 
+            
+            <p class="mb-2">
+            For example, <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">{{greeting {name = "John"} }}</code> calls the component <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">greeting</code> with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">name</code> set to <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">John</code>, accessible from within the component as <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">ctx.name</code>.</p>
+            
+            <h3 class="text-lg font-bold mt-6 mb-2 text-slate-700">Line Continuation</h3>
+            <p class="mb-2">
+            Any line which starts with <code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">~></code> (after optional indentation).</p>
+            
+            <p class="mb-2">
+            It may sound technical, but it is simple. A line continuation is just that, a continuation of the prior line.</p>
+            
+            
+            <span id="grammar"></span>
+            <h2 class="text-2xl font-bold mt-6 mb-2">Grammar</h2>
+            <p class="mb-2">
+            The following is a definition of the HTT grammar.
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">How to read the grammar</h4>
+            <ul class="list-disc list-inside
+            ">
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">// ...</code> - this is a comment</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;rule-name&gt; =</code> - the name of a rule</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">  | ...</code> - the start a definition of the rule (there may be several)</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">  . ...</code> - this is a continuation of the previous rule definition</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;rule&gt;*</code> - 0 or more repetitions of rule</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;rule&gt;+</code> - 1 or more repetitions of rule</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">&lt;rule&gt;?</code> - 0 or 1 repetitions of rule</li>
+            <li><code class="bg-stone-100 text-gray-700 text-sm font-mono px-1 py-0.5 rounded">'...'</code> - anything in single quotes is a literal value</li>
+            </ul></p>
+            
+            <h4 class="text-base mt-6 mb-2 font-bold text-slate-500  decoration-dotted">Grammar</h4>
+            <div class="code-container relative my-4">
+                <div class="bg-stone-100 p-4 rounded-md">
+                    <div class="overflow-x-auto">
+            <pre class="code-block text-sm"><code class="text-gray-800">top =
+    | lua-line
+    | component
+    | code
+
+  lua-line =
+    | ws* '%' lua nl
+
+  code =
+    | code-open nl
+    . lua nl
+    . code-close nl
+
+  code-open =
+    | ws* '%' ws+ '@code'
+
+  code-close = 
+    | ws* '%' ws+ '@end'
+
+  component =
+    | component-open nl
+    . component-line
+    . component-close nl
+
+  component-open =
+    | ws* '%' ws+ '@component' component_name
+
+  component_name =
+    | [a-zA-Z_][a-zA-Z0-9_]*
+
+  component-line =
+    | lua-line
+    | text-line
+    | code
+
+  component-close =
+    | ws* '%' ws+ '@end'
+
+  text-line =
+    | ws* line-continuation? element* nl
+
+  line-continuation =
+    | '~>'
+
+  element =
+    | text
+    | expression
+    | component-call
+
+  // here, 'lua' must be a single-line expression.
+  expression =
+    | '{{' lua '}}'
+
+  // here 'lua-table-expr' is some single-line lua expression
+  // which evaluates to a Lua table.
+  component-call =
+    | '{{@' ws* component_name ws+ lua-table-expr '}}'
+
+  ws =
+    | \r
+    | \t
+    | ' '
+
+  nl =
+    | \r? \n
+</code></pre>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initState() {
+            return {
+                mobileMenuOpen: false,
+                openSections: ['Handbook']
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre.code-block code').forEach((codeBlock) => {
+    let lines = codeBlock.innerHTML.split('\n');
+
+    // Find the minimum non-zero indentation, ignoring the first line
+    const minIndent = lines.slice(1).reduce((min, line) => {
+      const indent = line.match(/^\s*/)[0].length;
+      return (line.trim().length && indent < min) ? indent : min;
+    }, Infinity);
+
+    // Process lines: keep first line as is, remove minIndent from others
+    const processedLines = [
+      lines[0],
+      ...lines.slice(1).map(line => {
+        const currentIndent = line.match(/^\s*/)[0].length;
+        return line.slice(Math.min(currentIndent, minIndent));
+      })
+    ];
+
+    codeBlock.innerHTML = processedLines.join('\n');
+  });
+});
+    </script>
+</body>
+</html>
